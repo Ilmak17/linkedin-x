@@ -2,7 +2,7 @@
 
 ## Product Context
 
-- **What this is:** A browser extension that replaces the LinkedIn home feed with a calm, reader-focused timeline. The native feed keeps running offscreen as the engine; we render our own surface on top and proxy every action back to it.
+- **What this is:** A browser extension that replaces the LinkedIn home feed with an x.com-shaped timeline. The native feed keeps running underneath as the engine; we render our own surface on top and proxy every action back to it.
 - **Who it's for:** Developers and professionals who need LinkedIn for work and resent what the feed does to their attention.
 - **Space/industry:** Browser extensions that reskin a site they don't control. Peers: Modern for Hacker News, Refined GitHub, Old Reddit Redirect, linkedin-feed-blocker.
 - **Project type:** Reading surface. Not a dashboard, not a marketing site. Every decision serves sustained reading.
@@ -65,19 +65,23 @@ turned out to matter less than being instantly familiar.
 ## Spacing
 
 - **Base unit:** 4px.
-- **Density:** Comfortable. Denser than a blog, looser than LinkedIn.
-- **Scale:** `2xs 2 · xs 4 · sm 8 · md 12 · lg 16 · xl 24 · 2xl 32 · 3xl 48`
-- **Post block:** 16px top/bottom padding, 12px gutter between avatar and content, 12px between body and action row.
-- **Action row:** 4 actions, `justify-content: space-between` capped at 320px wide, so the icons align down the whole column.
+- **Post block:** 12px vertical padding, 16px horizontal, 12px gutter between
+  avatar and content. Denser than the first version, because a feed you scroll
+  is not an article you settle into.
+- **Action row:** four actions, `space-between`, capped at 425px so the icons
+  align down the whole column.
+- **Rail links:** 11px/12px padding inside a pill that only paints on hover.
 
 ## Layout
 
-- **Approach:** Grid-disciplined. One column, no exceptions.
-- **Column:** 600px, centered. Below 640px viewport it goes full-bleed with 16px side padding.
-- **No sidebars.** Not narrower ones, not collapsible ones. The right rail is where LinkedIn puts everything we are removing.
-- **Separators:** a single 1px `--hairline` rule between posts. No cards, no borders, no shadows, no background shifts. This is the second risk: it removes the "corporate card stack" read entirely, at the cost of slightly weaker post boundaries when two short posts sit adjacent. The 16px padding carries that weight.
-- **Top bar:** sticky, 52px, `--bg` with a bottom hairline. Wordmark left, settings gear right. Nothing else.
-- **Radius:** `sm 6px` (images, buttons), `md 10px` (menus, dialogs), `full` (avatars only). Avatars are 40px in the feed, 32px in comments.
+- **Three columns**, centred: `275px` rail, `600px` timeline, `350px` aside.
+- **Timeline** is bordered left and right, which is what stops it reading as
+  text floating in a void.
+- **Sticky tab head** with a blurred translucent background, `For you` active.
+- **Breakpoints:** under 1265px the right rail goes and the left rail collapses
+  to icons; under 700px only the timeline remains.
+- **Radius:** `16px` (media, cards, composer), `999px` (avatars, buttons,
+  action rings). Avatars are 40px in the feed, 32px in comments.
 
 ## Motion
 
@@ -86,7 +90,7 @@ turned out to matter less than being instantly familiar.
 - **Easing:** enter `cubic-bezier(0.16, 1, 0.3, 1)`, exit `ease-in`, move `ease-in-out`.
 - **Duration:** micro 100ms (hover, color), short 180ms (menus, disclosure), medium 260ms.
 - **No entrance animation on posts.** Animating rows during a scroll-driven infinite feed reads as jank, not polish.
-- **The one moment:** the like button scales `1 → 1.25 → 1` over 220ms on the enter curve and fills with `--accent`. It fires optimistically, before the proxied click resolves. If the action fails, it reverses over 180ms and a hairline toast explains why.
+- **The one moment:** the like button scales `1 → 1.35 → 1` over 300ms and fills with `--like`. It fires optimistically, before the proxied click resolves. If the action fails it reverses, and a toast says why.
 - **Respect `prefers-reduced-motion: reduce`:** all of the above collapses to instant state changes.
 
 ## Decisions Log
