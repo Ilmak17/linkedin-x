@@ -12,6 +12,7 @@ import {
   warmingUp,
 } from '../state/store'
 import { Aside } from './Aside'
+import { cursor, useKeyboard } from './useKeyboard'
 import { Button, EmptyState, Skeleton, Tabs } from './kit'
 import { PostCard } from './PostCard'
 import { Rail } from './Rail'
@@ -19,6 +20,7 @@ import { Rail } from './Rail'
 export function App() {
   const sentinel = useRef<HTMLDivElement>(null)
   const scroller = useRef<HTMLDivElement>(null)
+  useKeyboard(scroller)
 
   // Infinite scroll. Reaching the end of our column asks the host for another
   // page, which it gets by scrolling LinkedIn's own scroll container.
@@ -90,8 +92,8 @@ export function App() {
                 </EmptyState>
               )}
 
-              {posts.map((p) => (
-                <PostCard post={p} key={p.id} />
+              {posts.map((p, i) => (
+                <PostCard post={p} key={p.id} cursored={cursor.value === i} />
               ))}
 
               <div ref={sentinel} />

@@ -796,3 +796,15 @@ input[type='checkbox']:checked::after {
 .kit-row:hover .job-title {
   text-decoration: underline;
 }
+
+.rail-foot kbd {
+  display: inline-block;
+  min-width: 18px;
+  padding: 1px 5px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--elevated);
+  color: var(--muted);
+  font: 500 11px/16px var(--sans);
+  text-align: center;
+}

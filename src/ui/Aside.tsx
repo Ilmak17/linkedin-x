@@ -1,5 +1,6 @@
 import { hiddenCount, settings, visiblePosts } from '../state/store'
 import { saveSettings, type AppSettings } from '../lib/settings'
+import { SearchBox } from './kit'
 
 const FILTERS: Array<{ key: keyof AppSettings; label: string; sub: string }> = [
   { key: 'showPromoted', label: 'Ads', sub: 'Promoted and sponsored posts' },
@@ -18,6 +19,7 @@ export function Aside() {
 
   return (
     <aside class="aside">
+      <SearchBox />
       <div class="card">
         <h2>This session</h2>
         <div class="stat">

@@ -1,6 +1,6 @@
 import { signal } from '@preact/signals'
 import type { NetworkHost, RawPerson } from '../host/network-host'
-import { Avatar, Button, EmptyState, Row, Skeleton, Tabs } from './kit'
+import { Avatar, Button, EmptyState, Row, SearchBox, Skeleton, Tabs } from './kit'
 import { Rail } from './Rail'
 
 export const people = signal<RawPerson[]>([])
@@ -80,6 +80,7 @@ export function NetworkPage() {
         </main>
 
         <aside class="aside">
+          <SearchBox />
           <div class="card">
             <h2>Suggestions</h2>
             <div class="stat">

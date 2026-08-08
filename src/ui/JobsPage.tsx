@@ -1,9 +1,10 @@
-import { dismissJob, jobs, jobsWarmingUp, openJob, selectedJob } from '../state/jobs'
-import { Avatar, Button, Chip, EmptyState, Row, Skeleton, Tabs } from './kit'
+import { dismissJob, jobFilter, jobs, jobsWarmingUp, openJob, selectedJob, visibleJobs } from '../state/jobs'
+import { Avatar, Button, Chip, EmptyState, FilterBar, Row, SearchBox, Skeleton, Tabs } from './kit'
 import { Rail } from './Rail'
 
 export function JobsPage() {
-  const list = jobs.value
+  const list = visibleJobs.value
+  const total = jobs.value.length
 
   return (
     <div class="root">
@@ -19,6 +20,20 @@ export function JobsPage() {
             ]}
           />
 
+          <FilterBar
+            active={jobFilter.value}
+            onSelect={(key) => {
+              jobFilter.value = key
+            }}
+            filters={[
+              { key: 'all', label: `All${total ? ` ${total}` : ''}` },
+              { key: 'organic', label: 'No ads' },
+              { key: 'remote', label: 'Remote' },
+              { key: 'easy', label: 'Easy Apply' },
+              { key: 'recent', label: 'This week' },
+            ]}
+          />
+
           {list.length === 0 && jobsWarmingUp.value && (
             <>
               <Skeleton lines={3} />
@@ -28,7 +43,25 @@ export function JobsPage() {
           )}
 
           {list.length === 0 && !jobsWarmingUp.value && (
-            <EmptyState title="No jobs here">LinkedIn returned no results for this search.</EmptyState>
+            <EmptyState
+              title={total > 0 ? 'Nothing matches that filter' : 'No jobs here'}
+              action={
+                total > 0 ? (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      jobFilter.value = 'all'
+                    }}
+                  >
+                    Clear the filter
+                  </Button>
+                ) : undefined
+              }
+            >
+              {total > 0
+                ? `${total} job${total === 1 ? '' : 's'} loaded, none of them fit.`
+                : 'LinkedIn returned no results for this search.'}
+            </EmptyState>
           )}
 
           {list.map((job) => (
@@ -70,11 +103,12 @@ export function JobsPage() {
         </main>
 
         <aside class="aside">
+          <SearchBox />
           <div class="card">
             <h2>This search</h2>
             <div class="stat">
               <b>{list.length}</b>
-              <span>jobs listed</span>
+              <span>{list.length === total ? 'jobs listed' : `of ${total} shown`}</span>
             </div>
           </div>
           <div class="card">

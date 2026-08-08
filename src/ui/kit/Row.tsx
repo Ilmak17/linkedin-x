@@ -7,6 +7,8 @@ interface Props {
   /** Rendered hard right and vertically centred: a button, a menu. */
   trail?: ComponentChildren
   selected?: boolean
+  /** The keyboard is pointing at this row. */
+  cursored?: boolean
   onClick?: () => void
   /** Vertically centre the row instead of top-aligning it. */
   align?: 'top' | 'center'
@@ -19,11 +21,13 @@ interface Props {
  * hover tint, the focus ring. Surfaces compose rows and never set spacing of
  * their own, which is what stopped the four screens drifting apart.
  */
-export function Row({ children, lead, trail, selected, onClick, align = 'top' }: Props) {
+export function Row({ children, lead, trail, selected, cursored, onClick, align = 'top' }: Props) {
   const interactive = Boolean(onClick)
   return (
     <article
-      class={`kit-row kit-row--${align}${selected ? ' is-selected' : ''}${interactive ? ' is-clickable' : ''}`}
+      class={`kit-row kit-row--${align}${selected ? ' is-selected' : ''}${cursored ? ' is-cursor' : ''}${
+        interactive ? ' is-clickable' : ''
+      }`}
       onClick={onClick}
       onKeyDown={
         interactive

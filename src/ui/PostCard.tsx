@@ -9,7 +9,7 @@ import { PlayIcon } from './icons'
 
 const CLAMP_AT = 900 // characters, roughly twelve lines at 17px/1.6
 
-export function PostCard({ post }: { post: Post }) {
+export function PostCard({ post, cursored }: { post: Post; cursored?: boolean }) {
   const [expanded, setExpanded] = useState(false)
   const threadOpen = openThread.value === post.id
   const long = post.text.length > CLAMP_AT
@@ -20,7 +20,7 @@ export function PostCard({ post }: { post: Post }) {
   const link = post.permalink
 
   return (
-    <Row lead={<Avatar src={post.author.avatar} name={post.author.name} href={post.author.url} />}>
+    <Row cursored={cursored} lead={<Avatar src={post.author.avatar} name={post.author.name} href={post.author.url} />}>
       <>
         <div class="byline">
           <a class="name" href={post.author.url} target="_blank" rel="noreferrer noopener">

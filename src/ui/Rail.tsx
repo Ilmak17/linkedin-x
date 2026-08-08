@@ -51,9 +51,9 @@ export function Rail({ current = 'Home' }: { current?: string }) {
       </a>
 
       <div class="rail-foot">
-        Reading LinkedIn through linkedin-x.
+        <kbd>j</kbd> <kbd>k</kbd> move · <kbd>l</kbd> like · <kbd>s</kbd> save
         <br />
-        Everything above opens the real LinkedIn.
+        <kbd>enter</kbd> comments · <kbd>/</kbd> search
       </div>
     </nav>
   )

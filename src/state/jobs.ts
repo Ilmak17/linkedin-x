@@ -1,9 +1,66 @@
-import { signal } from '@preact/signals'
+import { computed, signal } from '@preact/signals'
 import type { JobsHost, RawJob } from '../host/jobs-host'
 
 export const jobs = signal<RawJob[]>([])
 export const jobsWarmingUp = signal(true)
 export const selectedJob = signal<string | null>(null)
+export const jobFilter = signal('all')
+
+/**
+ * Filtering happens over what we already read, so it costs nothing and
+ * needs no round trip to LinkedIn. Remote is decided by the location string,
+ * which is where LinkedIn puts it.
+ */
+/**
+ * Days per unit, most specific first. Order is the whole trick: a pattern for
+ * minutes that allows a bare "m" also matches "month", which read a month-old
+ * listing as posted minutes ago.
+ */
+const UNITS: Array<[RegExp, number]> = [
+  [/^(month|mo|мес)/i, 30],
+  [/^(minute|min|мин)/i, 0],
+  [/^(week|wk|недел|нед)/i, 7],
+  [/^(hour|hr|час)/i, 0],
+  [/^(day|дн|день|дня|дней)/i, 1],
+  [/^(year|yr|год|года|лет)/i, 365],
+  [/^m$/i, 0],
+  [/^h$/i, 0],
+  [/^d$/i, 1],
+  [/^w$/i, 7],
+  [/^y$/i, 365],
+]
+
+/**
+ * "3 days ago", "5 hours ago", "1 month ago" — LinkedIn's own phrasing, in
+ * whichever language the member reads it in.
+ */
+export function isRecent(label: string, withinDays = 7): boolean {
+  const match = label.match(/(\d+)\s*([a-zа-яё]+)/i)
+  if (!match) return false
+
+  const amount = Number(match[1])
+  const unit = match[2] ?? ''
+  const perUnit = UNITS.find(([re]) => re.test(unit))?.[1]
+  if (perUnit === undefined) return false
+
+  return amount * perUnit <= withinDays
+}
+
+export const visibleJobs = computed(() => {
+  const all = jobs.value
+  switch (jobFilter.value) {
+    case 'remote':
+      return all.filter((j) => /remote|удал/i.test(j.location))
+    case 'easy':
+      return all.filter((j) => j.badges.some((b) => /easy apply/i.test(b)))
+    case 'recent':
+      return all.filter((j) => isRecent(j.postedLabel))
+    case 'organic':
+      return all.filter((j) => !j.badges.some((b) => /promoted|продвиг/i.test(b)))
+    default:
+      return all
+  }
+})
 
 let host: JobsHost
 
