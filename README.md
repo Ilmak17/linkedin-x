@@ -35,6 +35,7 @@ linkedin-x takes a third path: keep LinkedIn's feed running as the engine, draw 
 | Network | `/mynetwork/*` | Suggestions, connect through LinkedIn's own button |
 | Profile | `/in/*` | Top card and about, with follow and connect |
 | Company | `/company/*` | Top card and the page's posts, with follow |
+| Saved | `/my-items/*` | Posts you kept, with their permalinks |
 
 - **x's shell.** 275px rail, 600px timeline, 350px rail, dark only.
 - **Noise gone by default.** Ads, "people you may know", carousels and polls. Each switchable in the right rail.
@@ -127,7 +128,7 @@ Click the toolbar icon.
 
 ```bash
 npm run dev        # rebuild the content script on change
-npm test           # 130 tests, no browser needed
+npm test           # 138 tests, no browser needed
 npm run typecheck
 ```
 
