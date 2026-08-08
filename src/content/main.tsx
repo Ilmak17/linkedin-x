@@ -1,4 +1,5 @@
 import { render } from 'preact'
+import kit from '../ui/kit.css?inline'
 import styles from '../ui/styles.css?inline'
 import { fontFaceCss } from '../ui/fonts'
 import { DomHost } from '../host/dom-host'
@@ -86,7 +87,7 @@ function mount(surface: SurfaceName): void {
   const shadow = shadowHost.attachShadow({ mode: 'open' })
 
   const sheet = document.createElement('style')
-  sheet.textContent = `${fontFaceCss()}\n${styles}`
+  sheet.textContent = [fontFaceCss(), kit, styles].join("\n")
   shadow.append(sheet)
 
   const container = document.createElement('div')

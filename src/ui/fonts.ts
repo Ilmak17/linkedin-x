@@ -16,9 +16,11 @@ interface FontFile {
 }
 
 export const FONT_FILES: FontFile[] = [
-  { family: 'General Sans', file: 'general-sans-400.woff2', weight: '400' },
-  { family: 'General Sans', file: 'general-sans-500.woff2', weight: '500' },
-  { family: 'General Sans', file: 'general-sans-600.woff2', weight: '600' },
+  // x.com sets its interface in Chirp, which is proprietary and cannot be
+  // redistributed in an extension. Inter is the closest freely licensed match
+  // on both metrics and tone, so the stack asks for Chirp first — a machine
+  // that has it installed gets the real thing — and falls back to this.
+  { family: 'Inter', file: 'inter-variable.woff2', weight: '100 900' },
   { family: 'Source Serif 4', file: 'source-serif-4-variable.woff2', weight: '200 900' },
   { family: 'Source Serif 4', file: 'source-serif-4-italic.woff2', weight: '200 900', style: 'italic' },
   { family: 'JetBrains Mono', file: 'jetbrains-mono-400.woff2', weight: '400' },

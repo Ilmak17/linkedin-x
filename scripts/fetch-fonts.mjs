@@ -3,7 +3,7 @@
 // talks to a font CDN at runtime.
 //
 // All three are freely redistributable:
-//   General Sans   — ITF Free Font License (Fontshare)
+//   Inter          — SIL Open Font License 1.1
 //   Source Serif 4 — SIL Open Font License 1.1
 //   JetBrains Mono — SIL Open Font License 1.1
 // See fonts/LICENSES.md.
@@ -21,19 +21,9 @@ const UA =
 
 const SOURCES = [
   {
-    out: 'general-sans-400.woff2',
-    css: 'https://api.fontshare.com/v2/css?f[]=general-sans@400&display=swap',
-    pick: (urls) => urls[0],
-  },
-  {
-    out: 'general-sans-500.woff2',
-    css: 'https://api.fontshare.com/v2/css?f[]=general-sans@500&display=swap',
-    pick: (urls) => urls[0],
-  },
-  {
-    out: 'general-sans-600.woff2',
-    css: 'https://api.fontshare.com/v2/css?f[]=general-sans@600&display=swap',
-    pick: (urls) => urls[0],
+    out: 'inter-variable.woff2',
+    css: 'https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap',
+    pick: (urls) => urls[urls.length - 1], // latin subset is emitted last
   },
   {
     out: 'source-serif-4-variable.woff2',

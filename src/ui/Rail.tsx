@@ -32,10 +32,11 @@ const LINKS = [
 export function Rail({ current = 'Home' }: { current?: string }) {
   return (
     <nav class="rail" aria-label="LinkedIn">
-      <div class="brand">
-        <span class="glyph">x</span>
-        <span>linkedin-x</span>
-      </div>
+      <a class="brand" href="https://www.linkedin.com/feed/" aria-label="linkedin-x" title="linkedin-x">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 3h4.6l5 6.9L18.7 3H21l-7.2 8.4L21.4 21h-4.6l-5.4-7.4L4.7 21H2.4l7.7-9z" />
+        </svg>
+      </a>
 
       {LINKS.map(({ href, label, Icon }) => (
         <a key={href} class="rail-link" href={href} aria-current={label === current ? 'page' : undefined} title={label}>

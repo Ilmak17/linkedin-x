@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'preact/hooks'
 import type { RawComment } from '../host/types'
-import { initialsOf } from '../model/post'
+
 import { loadComments, submitComment } from '../state/store'
 import type { Post } from '../model/post'
-import { Avatar } from './Avatar'
+import { Avatar } from './kit'
 
 export function CommentThread({ post }: { post: Post }) {
   const [comments, setComments] = useState<RawComment[] | null>(null)
@@ -53,7 +53,7 @@ export function CommentThread({ post }: { post: Post }) {
 
       {comments?.map((c) => (
         <div class="comment" key={c.id}>
-          <Avatar src={c.avatarUrl} initials={initialsOf(c.authorName)} name={c.authorName} />
+          <Avatar src={c.avatarUrl} name={c.authorName} size={32} />
           <div class="body">
             <div class="byline">
               <span class="name">{c.authorName || 'LinkedIn member'}</span>

@@ -12,22 +12,9 @@ import {
   warmingUp,
 } from '../state/store'
 import { Aside } from './Aside'
+import { Button, EmptyState, Skeleton, Tabs } from './kit'
 import { PostCard } from './PostCard'
 import { Rail } from './Rail'
-
-function Skeleton() {
-  return (
-    <div class="skeleton">
-      <div class="sk-avatar" />
-      <div class="sk-body">
-        <div class="sk-line" style="width:36%" />
-        <div class="sk-line" style="width:92%;margin-top:12px" />
-        <div class="sk-line" style="width:84%" />
-        <div class="sk-line" style="width:58%" />
-      </div>
-    </div>
-  )
-}
 
 export function App() {
   const sentinel = useRef<HTMLDivElement>(null)
@@ -58,21 +45,12 @@ export function App() {
         <Rail />
 
         <main class="feed">
-          <div class="feed-head">
-            <div class="tabs" role="tablist">
-              <button class="tab" role="tab" aria-selected="true">
-                For you
-              </button>
-              <a
-                class="tab"
-                role="tab"
-                aria-selected="false"
-                href="https://www.linkedin.com/feed/?filterType=following"
-              >
-                Following
-              </a>
-            </div>
-          </div>
+          <Tabs
+            tabs={[
+              { label: 'For you', active: true },
+              { label: 'Following', href: 'https://www.linkedin.com/feed/?filterType=following' },
+            ]}
+          />
 
           <a
             class="composer-cta"
@@ -84,17 +62,16 @@ export function App() {
           </a>
 
           {brokenReason.value ? (
-            <div class="state">
-              <h2>LinkedIn changed something</h2>
-              <p>
-                We can see the feed but cannot read it, so we are staying out of the way.
-                <br />
-                {brokenReason.value}
-              </p>
-              <button class="btn" onClick={() => void saveSettings({ enabled: false })}>
-                Show the original LinkedIn
-              </button>
-            </div>
+            <EmptyState
+              title="LinkedIn changed something"
+              action={
+                <Button variant="outline" onClick={() => void saveSettings({ enabled: false })}>
+                  Show the original LinkedIn
+                </Button>
+              }
+            >
+              We can see the feed but cannot read it, so we are staying out of the way. {brokenReason.value}
+            </EmptyState>
           ) : (
             <>
               {posts.length === 0 && warmingUp.value && (
@@ -106,18 +83,11 @@ export function App() {
               )}
 
               {posts.length === 0 && !warmingUp.value && (
-                <div class="state">
-                  <h2>Nothing left to read</h2>
-                  <p>
-                    LinkedIn is not sending anything we would call a post right now.
-                    {hiddenCount.value > 0 && (
-                      <>
-                        <br />
-                        {hiddenCount.value} item{hiddenCount.value === 1 ? ' was' : 's were'} filtered out as noise.
-                      </>
-                    )}
-                  </p>
-                </div>
+                <EmptyState title="Nothing left to read">
+                  LinkedIn is not sending anything we would call a post right now.
+                  {hiddenCount.value > 0 &&
+                    ` ${hiddenCount.value} item${hiddenCount.value === 1 ? ' was' : 's were'} filtered out as noise.`}
+                </EmptyState>
               )}
 
               {posts.map((p) => (
@@ -127,20 +97,23 @@ export function App() {
               <div ref={sentinel} />
 
               {posts.length > 0 && exhausted.value && (
-                <div class="state">
-                  <h2>You're all caught up</h2>
-                  <p>LinkedIn has stopped sending new posts for now.</p>
-                  <button class="btn" onClick={retryLoadMore}>
-                    Check again
-                  </button>
-                </div>
+                <EmptyState
+                  title="You're all caught up"
+                  action={
+                    <Button variant="outline" onClick={retryLoadMore}>
+                      Check again
+                    </Button>
+                  }
+                >
+                  LinkedIn has stopped sending new posts for now.
+                </EmptyState>
               )}
 
               {posts.length > 0 && !exhausted.value && (
                 <div class="footer">
-                  <button class="btn" disabled={loadingMore.value} onClick={() => void loadMore()}>
+                  <Button variant="outline" disabled={loadingMore.value} onClick={() => void loadMore()}>
                     {loadingMore.value ? 'Loading' : 'Show more posts'}
-                  </button>
+                  </Button>
                 </div>
               )}
             </>

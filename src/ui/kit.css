@@ -1,0 +1,275 @@
+/* The component kit. Every list row, avatar, button, chip, tab, empty state
+   and skeleton in the product renders from here, so density and hover
+   behaviour are decided once instead of per surface. Surfaces set no spacing
+   of their own. */
+
+/* --- row --------------------------------------------------------------- */
+
+.kit-row {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  transition: background 120ms ease;
+}
+.kit-row--center {
+  align-items: center;
+}
+.kit-row--top {
+  align-items: flex-start;
+}
+.kit-row.is-clickable {
+  cursor: pointer;
+}
+.kit-row:hover {
+  background: var(--hover);
+}
+.kit-row.is-selected {
+  background: var(--hover);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+.kit-row.is-clickable:focus-visible {
+  outline: none;
+  background: var(--hover);
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.kit-row__lead {
+  flex: 0 0 auto;
+}
+.kit-row__body {
+  flex: 1;
+  min-width: 0;
+}
+.kit-row__trail {
+  flex: 0 0 auto;
+  align-self: center;
+}
+
+/* --- avatar ------------------------------------------------------------ */
+
+.kit-avatar {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--elevated);
+  color: var(--muted);
+  font-weight: 600;
+  text-decoration: none;
+  flex: 0 0 auto;
+}
+.kit-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.kit-avatar--round {
+  border-radius: 999px;
+}
+.kit-avatar--square {
+  border-radius: 8px;
+}
+.kit-avatar--32 {
+  width: 32px;
+  height: 32px;
+  font-size: 11px;
+}
+.kit-avatar--40 {
+  width: 40px;
+  height: 40px;
+  font-size: 13px;
+}
+.kit-avatar--48 {
+  width: 48px;
+  height: 48px;
+  font-size: 15px;
+}
+a.kit-avatar:hover {
+  opacity: 0.86;
+}
+
+/* --- button ------------------------------------------------------------ */
+
+.kit-btn {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-family: var(--sans);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 120ms ease, border-color 120ms ease, opacity 120ms ease;
+}
+.kit-btn--md {
+  padding: 9px 18px;
+  font-size: 14px;
+}
+.kit-btn--sm {
+  padding: 6px 14px;
+  font-size: 13px;
+}
+.kit-btn--primary {
+  background: var(--text);
+  color: var(--bg);
+}
+.kit-btn--primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+.kit-btn--outline {
+  border-color: var(--border);
+  color: var(--text);
+  background: transparent;
+}
+.kit-btn--outline:hover:not(:disabled) {
+  background: var(--elevated);
+  border-color: var(--muted);
+}
+.kit-btn--ghost {
+  color: var(--muted);
+  background: transparent;
+}
+.kit-btn--ghost:hover:not(:disabled) {
+  background: var(--elevated);
+  color: var(--text);
+}
+.kit-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.kit-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Reserves the width of the widest label the button will ever hold, so a row
+   does not reflow when "Connect" becomes "Pending". */
+.kit-btn__ghost {
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+  grid-area: 1 / 1;
+}
+.kit-btn__label {
+  grid-area: 1 / 1;
+}
+
+/* --- chip -------------------------------------------------------------- */
+
+.kit-chip {
+  display: inline-block;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 9px;
+}
+.kit-chip--muted {
+  color: var(--faint);
+  border-style: dashed;
+}
+
+/* --- sticky head and tabs ---------------------------------------------- */
+
+.kit-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(12px) saturate(140%);
+  border-bottom: 1px solid var(--border);
+}
+.kit-tabs {
+  display: flex;
+}
+.kit-tab {
+  flex: 1;
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 17px 0 15px;
+  background: none;
+  border: 0;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+.kit-tab:hover {
+  background: var(--hover);
+}
+.kit-tab[aria-selected='true'] {
+  color: var(--text);
+  font-weight: 700;
+}
+.kit-tab[aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: 56px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+.kit-tab:focus-visible {
+  outline: none;
+  background: var(--hover);
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+/* --- empty state and skeleton ------------------------------------------ */
+
+.kit-empty {
+  padding: 72px 32px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 22px;
+}
+.kit-empty h2 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.kit-empty .kit-btn {
+  margin-top: 20px;
+}
+
+.kit-skeleton {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.kit-skeleton__lead {
+  flex: 0 0 40px;
+  height: 40px;
+  border-radius: 999px;
+}
+.kit-skeleton__body {
+  flex: 1;
+}
+.kit-skeleton__line {
+  height: 11px;
+  border-radius: 4px;
+  margin-bottom: 9px;
+}
+.kit-skeleton__lead,
+.kit-skeleton__line {
+  background: linear-gradient(90deg, var(--elevated) 25%, var(--elevated-hover) 50%, var(--elevated) 75%);
+  background-size: 200% 100%;
+  animation: kit-shimmer 1.4s linear infinite;
+}
+@keyframes kit-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}

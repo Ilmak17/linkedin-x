@@ -1,99 +1,71 @@
-import { jobs, jobsWarmingUp, dismissJob, openJob, selectedJob } from '../state/jobs'
+import { dismissJob, jobs, jobsWarmingUp, openJob, selectedJob } from '../state/jobs'
+import { Avatar, Button, Chip, EmptyState, Row, Skeleton, Tabs } from './kit'
 import { Rail } from './Rail'
-import { JobsIcon } from './icons'
-
-function initials(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean)
-  return ((parts[0]?.[0] ?? '') + (parts[1]?.[0] ?? '')).toUpperCase() || '·'
-}
 
 export function JobsPage() {
   const list = jobs.value
 
   return (
     <div class="root">
-      <div class="shell shell--jobs">
+      <div class="shell">
         <Rail current="Jobs" />
 
         <main class="feed">
-          <div class="feed-head">
-            <div class="tabs" role="tablist">
-              <button class="tab" role="tab" aria-selected="true">
-                Jobs
-              </button>
-              <a class="tab" role="tab" aria-selected="false" href="https://www.linkedin.com/jobs/">
-                Recommended
-              </a>
-            </div>
-          </div>
+          <Tabs
+            tabs={[
+              { label: 'Search', active: true },
+              { label: 'Recommended', href: 'https://www.linkedin.com/jobs/collections/recommended/' },
+              { label: 'Saved', href: 'https://www.linkedin.com/my-items/saved-jobs/' },
+            ]}
+          />
 
           {list.length === 0 && jobsWarmingUp.value && (
             <>
-              <div class="skeleton">
-                <div class="sk-avatar" />
-                <div class="sk-body">
-                  <div class="sk-line" style="width:52%" />
-                  <div class="sk-line" style="width:34%" />
-                  <div class="sk-line" style="width:24%" />
-                </div>
-              </div>
-              <div class="skeleton">
-                <div class="sk-avatar" />
-                <div class="sk-body">
-                  <div class="sk-line" style="width:44%" />
-                  <div class="sk-line" style="width:38%" />
-                  <div class="sk-line" style="width:20%" />
-                </div>
-              </div>
+              <Skeleton lines={3} />
+              <Skeleton lines={3} />
+              <Skeleton lines={3} />
             </>
           )}
 
           {list.length === 0 && !jobsWarmingUp.value && (
-            <div class="state">
-              <h2>No jobs here</h2>
-              <p>LinkedIn returned no results for this search.</p>
-            </div>
+            <EmptyState title="No jobs here">LinkedIn returned no results for this search.</EmptyState>
           )}
 
           {list.map((job) => (
-            <article
-              class={`post job${selectedJob.value === job.id ? ' selected' : ''}`}
+            <Row
               key={job.id}
+              selected={selectedJob.value === job.id}
               onClick={() => openJob(job.id)}
+              lead={<Avatar src={job.logoUrl} name={job.company} shape="square" size={48} />}
+              trail={
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  aria-label={`Dismiss ${job.title}`}
+                  title="Not interested"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    dismissJob(job.id)
+                  }}
+                >
+                  Hide
+                </Button>
+              }
             >
-              <div class="avatar avatar--square">
-                {job.logoUrl ? <img src={job.logoUrl} alt="" loading="lazy" /> : <span>{initials(job.company)}</span>}
+              <div class="job-title">{job.title}</div>
+              <div class="job-meta">
+                {job.company}
+                {job.location && <span class="dim"> · {job.location}</span>}
               </div>
-
-              <div class="body">
-                <div class="job-title">{job.title}</div>
-                <div class="job-meta">
-                  {job.company}
-                  {job.location && <span class="sep"> · </span>}
-                  {job.location}
-                </div>
-                <div class="job-foot">
-                  {job.postedLabel && <span class="job-posted">{job.postedLabel}</span>}
-                  {job.badges.map((b) => (
-                    <span class={`chip${/promoted|продвиг/i.test(b) ? ' chip--ad' : ''}`} key={b}>
-                      {b}
-                    </span>
-                  ))}
-                </div>
+              <div class="job-foot">
+                {job.postedLabel && <span class="dim">{job.postedLabel}</span>}
+                {job.badges.map((b) => (
+                  <Chip key={b} muted={/promoted|продвиг/i.test(b)}>
+                    {b}
+                  </Chip>
+                ))}
               </div>
-
-              <button
-                class="job-dismiss"
-                aria-label={`Dismiss ${job.title}`}
-                title="Not interested"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  dismissJob(job.id)
-                }}
-              >
-                ×
-              </button>
-            </article>
+            </Row>
           ))}
         </main>
 
@@ -108,13 +80,10 @@ export function JobsPage() {
           <div class="card">
             <div class="row">
               <label>
-                Clicking a job opens it in LinkedIn's own pane
-                <span class="sub">We list; LinkedIn still shows the detail and takes the application</span>
+                Opens in LinkedIn's own pane
+                <span class="sub">We list the results; LinkedIn keeps the detail and the application</span>
               </label>
             </div>
-            <a class="foot" href="https://www.linkedin.com/jobs/" target="_blank" rel="noreferrer noopener">
-              <JobsIcon /> Open LinkedIn Jobs
-            </a>
           </div>
         </aside>
       </div>

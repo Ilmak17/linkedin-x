@@ -2,8 +2,9 @@ import { useState } from 'preact/hooks'
 import type { Post } from '../model/post'
 import { openThread } from '../state/store'
 import { ActionBar } from './ActionBar'
-import { Avatar } from './Avatar'
+import { Avatar } from './kit'
 import { CommentThread } from './CommentThread'
+import { Row } from './kit'
 import { PlayIcon } from './icons'
 
 const CLAMP_AT = 900 // characters, roughly twelve lines at 17px/1.6
@@ -19,10 +20,8 @@ export function PostCard({ post }: { post: Post }) {
   const link = post.permalink
 
   return (
-    <article class="post">
-      <Avatar src={post.author.avatar} initials={post.author.initials} href={post.author.url} name={post.author.name} />
-
-      <div class="body">
+    <Row lead={<Avatar src={post.author.avatar} name={post.author.name} href={post.author.url} />}>
+      <>
         <div class="byline">
           <a class="name" href={post.author.url} target="_blank" rel="noreferrer noopener">
             {post.author.name}
@@ -86,7 +85,7 @@ export function PostCard({ post }: { post: Post }) {
         />
 
         {threadOpen && <CommentThread post={post} />}
-      </div>
-    </article>
+      </>
+    </Row>
   )
 }
