@@ -19,7 +19,7 @@ import {
  * or jobs.
  */
 const LINKS = [
-  { href: 'https://www.linkedin.com/feed/', label: 'Home', Icon: HomeIcon, current: true },
+  { href: 'https://www.linkedin.com/feed/', label: 'Home', Icon: HomeIcon },
   { href: 'https://www.linkedin.com/search/results/all/', label: 'Search', Icon: SearchIcon },
   { href: 'https://www.linkedin.com/notifications/', label: 'Notifications', Icon: BellIcon },
   { href: 'https://www.linkedin.com/messaging/', label: 'Messages', Icon: MessagesIcon },
@@ -29,7 +29,7 @@ const LINKS = [
   { href: 'https://www.linkedin.com/in/', label: 'Profile', Icon: ProfileIcon },
 ]
 
-export function Rail() {
+export function Rail({ current = 'Home' }: { current?: string }) {
   return (
     <nav class="rail" aria-label="LinkedIn">
       <div class="brand">
@@ -37,8 +37,8 @@ export function Rail() {
         <span>linkedin-x</span>
       </div>
 
-      {LINKS.map(({ href, label, Icon, current }) => (
-        <a key={href} class="rail-link" href={href} aria-current={current ? 'page' : undefined} title={label}>
+      {LINKS.map(({ href, label, Icon }) => (
+        <a key={href} class="rail-link" href={href} aria-current={label === current ? 'page' : undefined} title={label}>
           <Icon />
           <span>{label}</span>
         </a>

@@ -2,22 +2,43 @@ import { render } from 'preact'
 import styles from '../ui/styles.css?inline'
 import { fontFaceCss } from '../ui/fonts'
 import { DomHost } from '../host/dom-host'
+import { JobsHost } from '../host/jobs-host'
 import { attachHost, ingest, markBroken, settings, warmingUp } from '../state/store'
+import { attachJobsHost, ingestJobs, jobsWarmingUp } from '../state/jobs'
+import { JobsPage } from '../ui/JobsPage'
 import { cachedSettings, loadSettings, onSettingsChanged, type AppSettings } from '../lib/settings'
 import { App } from '../ui/App'
 
 const MOUNT_ID = 'linkedin-x-root'
-const FEED_PATH = /^\/feed\/?$/
+
+/**
+ * Which LinkedIn page we take over, and with what.
+ *
+ * Everything not listed here is left to LinkedIn: the rail links out to those
+ * pages and the overlay unmounts when you follow one. Adding a surface means
+ * a matcher, a host that reads that page, and a view — nothing in the ones
+ * already here has to change.
+ */
+type SurfaceName = 'feed' | 'jobs'
+
+const SURFACES: Array<{ name: SurfaceName; match: RegExp }> = [
+  { name: 'feed', match: /^\/feed\/?$/ },
+  { name: 'jobs', match: /^\/jobs\/(search|search-results|collections)/ },
+]
+
+function currentSurface(): SurfaceName | null {
+  return SURFACES.find((s) => s.match.test(location.pathname))?.name ?? null
+}
 const WARMUP_EVERY_MS = 500
 const WARMUP_TRIES = 40 // 20 seconds
 
 const host = new DomHost()
+const jobsHost = new JobsHost()
 let shadowHost: HTMLElement | null = null
 let unobserve: (() => void) | null = null
 let warmUpTimer: number | null = null
 let wired = false
-
-const onFeed = (): boolean => FEED_PATH.test(location.pathname)
+let mountedSurface: SurfaceName | null = null
 
 // Dark only, by design: see DESIGN.md. The setting is kept in storage so an
 // older profile does not break, but nothing reads it any more.
@@ -47,15 +68,14 @@ function publishDoctor(): void {
  * At `document_start` there is no `document.body` yet, so the host element
  * goes on `documentElement`, which always exists.
  */
-function mount(theme: 'dark' | 'light'): void {
-  if (shadowHost) {
-    shadowHost.setAttribute('data-theme', theme)
-    return
-  }
+function mount(surface: SurfaceName): void {
+  if (shadowHost && mountedSurface === surface) return
+  if (shadowHost) unmount()
+  mountedSurface = surface
 
   shadowHost = document.createElement('div')
   shadowHost.id = MOUNT_ID
-  shadowHost.setAttribute('data-theme', theme)
+  shadowHost.setAttribute('data-theme', THEME)
   const shadow = shadowHost.attachShadow({ mode: 'open' })
 
   const sheet = document.createElement('style')
@@ -72,7 +92,7 @@ function mount(theme: 'dark' | 'light'): void {
   // suppress the scrollbar, not the scrolling.
   document.documentElement.style.setProperty('scrollbar-width', 'none')
 
-  render(<App />, container)
+  render(surface === 'jobs' ? <JobsPage /> : <App />, container)
 }
 
 /**
@@ -83,6 +103,18 @@ function mount(theme: 'dark' | 'light'): void {
 function wire(): void {
   if (wired || !shadowHost) return
   wired = true
+
+  if (mountedSurface === 'jobs') {
+    attachJobsHost(jobsHost)
+    ingestJobs(jobsHost.harvest())
+    unobserve = jobsHost.observe(ingestJobs)
+    // Job results arrive with the document rather than trickling in, so the
+    // feed's twenty-second warm-up would only delay the empty state.
+    setTimeout(() => {
+      jobsWarmingUp.value = false
+    }, 4000)
+    return
+  }
 
   attachHost(host)
   ingest(host.harvest())
@@ -159,6 +191,7 @@ function unmount(): void {
   wired = false
   shadowHost?.remove()
   shadowHost = null
+  mountedSurface = null
   document.documentElement.style.removeProperty('scrollbar-width')
   delete document.documentElement.dataset.linkedinXDoctor
 }
@@ -166,8 +199,9 @@ function unmount(): void {
 function applySettings(next: AppSettings): void {
   settings.value = next
 
-  if (next.enabled && onFeed()) {
-    mount(THEME)
+  const surface = currentSurface()
+  if (next.enabled && surface) {
+    mount(surface)
     whenDomReady(wire)
   } else {
     unmount()

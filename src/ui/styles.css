@@ -879,3 +879,79 @@ input[type='checkbox']:checked::after {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* --- jobs -------------------------------------------------------------- */
+
+.shell--jobs .feed {
+  padding-bottom: 20vh;
+}
+
+.post.job {
+  cursor: pointer;
+  align-items: flex-start;
+}
+.post.job.selected {
+  background: var(--hover);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.avatar--square {
+  border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  flex-basis: 48px;
+}
+
+.job-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--accent);
+  line-height: 20px;
+}
+.post.job:hover .job-title {
+  text-decoration: underline;
+}
+.job-meta {
+  font-size: 14px;
+  color: var(--text);
+  margin-top: 2px;
+}
+.job-meta .sep {
+  color: var(--muted);
+}
+.job-posted {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.job-dismiss {
+  align-self: flex-start;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+.job-dismiss:hover {
+  background: var(--elevated);
+  color: var(--text);
+}
+
+.card a.foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card a.foot svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.7;
+}

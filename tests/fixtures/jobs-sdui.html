@@ -1,0 +1,58 @@
+<!--
+  LinkedIn's job search results, captured from the live site on 2026-08-09 and
+  rewritten with invented companies.
+
+  The only stable handle on a card is
+  `componentkey="job-card-component-ref-<jobId>"`: every class is a content
+  hash and the card carries no data-testid. The card prints title, company,
+  location and posting age as plain text, in that order, with the age
+  duplicated once for screen readers.
+-->
+<div>
+  <div componentkey="job-card-component-ref-4443260391">
+    <img src="https://media.example.com/logo-a.png" alt="" />
+    <a href="https://www.linkedin.com/jobs/view/4443260391/">
+      <div><span>Python Developer</span></div>
+    </a>
+    <div><span>Example Travel</span></div>
+    <div><span>Astana</span></div>
+    <div><span>Posted 1 week ago</span></div>
+    <div><span>1 week ago</span></div>
+    <button aria-label="Dismiss Python Developer job"></button>
+  </div>
+
+  <div componentkey="job-card-component-ref-4443256416">
+    <a href="https://www.linkedin.com/jobs/view/4443256416/">
+      <div><span>Full-stack Developer</span></div>
+    </a>
+    <div><span>Example Labs</span></div>
+    <div><span>Almaty (Remote)</span></div>
+    <div><span>Posted 3 days ago</span></div>
+    <button aria-label="Dismiss Full-stack Developer job"></button>
+  </div>
+
+  <!--
+    A verified listing: LinkedIn prints the title twice, once with a badge
+    suffix. Treating those as two leaves pushed the company into the title
+    slot and the location into the company slot.
+  -->
+  <div componentkey="job-card-component-ref-4313725078">
+    <a href="https://www.linkedin.com/jobs/view/4313725078/">
+      <div><span>Senior Backend Engineer (Verified job)</span></div>
+    </a>
+    <div><span>Senior Backend Engineer</span></div>
+    <div><span>Example Delivery</span></div>
+    <div><span>Doha, Qatar</span></div>
+    <div><span>Posted 2 weeks ago</span></div>
+    <button aria-label="Dismiss Senior Backend Engineer job"></button>
+  </div>
+
+  <!-- Already dismissed: LinkedIn swaps the control for an undo. -->
+  <div componentkey="job-card-component-ref-4443111111">
+    <div><span>Backend Engineer</span></div>
+    <div><span>Example Corp</span></div>
+    <div><span>Astana</span></div>
+    <div><span>Posted 2 weeks ago</span></div>
+    <button aria-label="Undo dismiss Backend Engineer job"></button>
+  </div>
+</div>
