@@ -85,3 +85,9 @@ export const PenIcon = () => (
     <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z" />
   </svg>
 )
+
+export const PlayIcon = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M7 4.5v15l13-7.5z" />
+  </svg>
+)

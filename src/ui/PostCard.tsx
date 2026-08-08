@@ -4,6 +4,7 @@ import { openThread } from '../state/store'
 import { ActionBar } from './ActionBar'
 import { Avatar } from './Avatar'
 import { CommentThread } from './CommentThread'
+import { PlayIcon } from './icons'
 
 const CLAMP_AT = 900 // characters, roughly twelve lines at 17px/1.6
 
@@ -55,8 +56,25 @@ export function PostCard({ post }: { post: Post }) {
             </div>
           ))}
 
-        {(post.hasVideo || post.linkTitle) && (
-          <div class="linkcard">{post.hasVideo ? 'video' : post.linkTitle} · open on LinkedIn to view</div>
+        {post.hasVideo && (
+          <a
+            class="mediacard"
+            href={link ?? post.author.url}
+            target="_blank"
+            rel="noreferrer noopener"
+            title="Play on LinkedIn"
+          >
+            <span class="play">
+              <PlayIcon />
+            </span>
+            <span class="label">Video · plays on LinkedIn</span>
+          </a>
+        )}
+
+        {!post.hasVideo && post.linkTitle && (
+          <a class="linkcard" href={link ?? post.author.url} target="_blank" rel="noreferrer noopener">
+            {post.linkTitle} · opens on LinkedIn
+          </a>
         )}
 
         <ActionBar

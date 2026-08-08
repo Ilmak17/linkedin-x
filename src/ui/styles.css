@@ -134,22 +134,35 @@
 }
 
 .post-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin: 16px 4px 0;
-  padding: 15px;
+  height: 52px;
   border: 0;
   border-radius: 999px;
   background: var(--text);
   color: var(--bg);
   font-family: var(--sans);
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 600;
   cursor: pointer;
-  text-align: center;
   text-decoration: none;
   transition: opacity 120ms ease;
 }
 .post-cta:hover {
   opacity: 0.9;
+}
+/* The pen is the collapsed-rail label; with room for the word it stays out. */
+.post-cta svg {
+  display: none;
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .rail-foot {
@@ -210,6 +223,29 @@
   height: 4px;
   border-radius: 999px;
   background: var(--accent);
+}
+
+/* --- composer ---------------------------------------------------------- */
+
+.composer-cta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  transition: background 120ms ease;
+}
+.composer-cta:hover {
+  background: var(--hover);
+}
+.composer-cta .prompt {
+  flex: 1;
+  font-size: 20px;
+  color: var(--muted);
+}
+.composer-cta .btn {
+  pointer-events: none;
 }
 
 /* --- post -------------------------------------------------------------- */
@@ -274,6 +310,8 @@
   text-decoration: underline;
 }
 
+/* LinkedIn headlines are sentences, not @handles. Capped so the name and the
+   age keep their place instead of being pushed out of the row. */
 .byline .headline {
   font-size: 15px;
   color: var(--muted);
@@ -281,6 +319,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   min-width: 0;
+  max-width: 42%;
 }
 
 .byline .sep {
@@ -355,6 +394,51 @@ a.time:hover {
 }
 a.linkcard:hover {
   background: var(--elevated);
+}
+
+/* We cannot play LinkedIn's video inside our own surface, so this stands in
+   for it: a media-shaped block that says what it is and opens the real thing,
+   rather than an empty box with a line of text in it. */
+.mediacard {
+  position: relative;
+  margin-top: 12px;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--elevated);
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text);
+  transition: background 120ms ease;
+}
+.mediacard:hover {
+  background: var(--elevated-hover);
+}
+.mediacard .play {
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid var(--border);
+}
+.mediacard .play svg {
+  width: 26px;
+  height: 26px;
+  fill: var(--text);
+  stroke: none;
+  margin-left: 3px;
+}
+.mediacard .label {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  font-size: 13px;
+  color: var(--muted);
 }
 
 /* --- actions ----------------------------------------------------------- */
@@ -764,9 +848,10 @@ input[type='checkbox']:checked::after {
   .post-cta {
     width: 50px;
     height: 50px;
-    padding: 0;
-    display: grid;
-    place-items: center;
+    margin: 16px 0 0 4px;
+  }
+  .post-cta svg {
+    display: block;
   }
   .rail-foot {
     display: none;

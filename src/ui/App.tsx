@@ -1,6 +1,16 @@
 import { useEffect, useRef } from 'preact/hooks'
 import { saveSettings } from '../lib/settings'
-import { brokenReason, hiddenCount, loadMore, loadingMore, toasts, visiblePosts, warmingUp } from '../state/store'
+import {
+  brokenReason,
+  exhausted,
+  hiddenCount,
+  loadMore,
+  loadingMore,
+  retryLoadMore,
+  toasts,
+  visiblePosts,
+  warmingUp,
+} from '../state/store'
 import { Aside } from './Aside'
 import { PostCard } from './PostCard'
 import { Rail } from './Rail'
@@ -32,7 +42,7 @@ export function App() {
 
     const io = new IntersectionObserver(
       (entries) => {
-        if (entries.some((e) => e.isIntersecting)) void loadMore()
+        if (entries.some((e) => e.isIntersecting) && !exhausted.value) void loadMore()
       },
       { root, rootMargin: '1200px 0px' },
     )
@@ -63,6 +73,15 @@ export function App() {
               </a>
             </div>
           </div>
+
+          <a
+            class="composer-cta"
+            href="https://www.linkedin.com/feed/?shareActive=true"
+            title="Write a post on LinkedIn"
+          >
+            <span class="prompt">What's happening?</span>
+            <span class="btn primary">Post</span>
+          </a>
 
           {brokenReason.value ? (
             <div class="state">
@@ -107,7 +126,17 @@ export function App() {
 
               <div ref={sentinel} />
 
-              {posts.length > 0 && (
+              {posts.length > 0 && exhausted.value && (
+                <div class="state">
+                  <h2>You're all caught up</h2>
+                  <p>LinkedIn has stopped sending new posts for now.</p>
+                  <button class="btn" onClick={retryLoadMore}>
+                    Check again
+                  </button>
+                </div>
+              )}
+
+              {posts.length > 0 && !exhausted.value && (
                 <div class="footer">
                   <button class="btn" disabled={loadingMore.value} onClick={() => void loadMore()}>
                     {loadingMore.value ? 'Loading' : 'Show more posts'}

@@ -16,6 +16,8 @@ export const allPosts = signal<Post[]>([])
 export const loadingMore = signal(false)
 /** True while the feed is still hydrating, so the UI shows skeletons not an empty state. */
 export const warmingUp = signal(true)
+/** Set once LinkedIn has stopped sending pages, so we stop asking. */
+export const exhausted = signal(false)
 export const toasts = signal<Toast[]>([])
 export const openThread = signal<string | null>(null)
 
@@ -151,10 +153,35 @@ export async function loadComments(id: string) {
   return []
 }
 
+let emptyPages = 0
+
+/**
+ * Asks the feed for another page.
+ *
+ * The give-up counter matters more than it looks: the sentinel that triggers
+ * this sits at the end of a short column, so it stays on screen, so a feed
+ * with nothing left to send would otherwise be asked again every time the
+ * previous attempt timed out, forever.
+ */
 export async function loadMore(): Promise<void> {
-  if (loadingMore.value) return
+  if (loadingMore.value || exhausted.value) return
+
   loadingMore.value = true
   const result = await host.loadMore()
   loadingMore.value = false
-  if (!result.ok) toast('LinkedIn stopped sending new posts')
+
+  if (result.ok) {
+    emptyPages = 0
+    return
+  }
+
+  emptyPages += 1
+  if (emptyPages >= 2) exhausted.value = true
+}
+
+/** Lets the user ask again after we gave up. */
+export function retryLoadMore(): void {
+  emptyPages = 0
+  exhausted.value = false
+  void loadMore()
 }
