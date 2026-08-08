@@ -1,27 +1,16 @@
-:root {
-  --bg: #0e0e10;
-  --surface: #16161a;
-  --hairline: #232329;
-  --text: #ededef;
-  --text-muted: #8b8b94;
-  --text-faint: #5a5a63;
-  --accent: #e8a33d;
-  --sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
-  color-scheme: dark;
-}
+/* The popup borrows the extension's own tokens rather than keeping a second
+   palette that drifts. Dark only, like the surfaces. */
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #fbfaf8;
-    --surface: #ffffff;
-    --hairline: #e6e3de;
-    --text: #17171a;
-    --text-muted: #6b6b73;
-    --text-faint: #9a9aa2;
-    --accent: #b26e10;
-    color-scheme: light;
-  }
+:root {
+  --bg: #000000;
+  --elevated: #16181c;
+  --elevated-hover: #1d1f23;
+  --border: #2f3336;
+  --text: #e7e9ea;
+  --muted: #71767b;
+  --accent: #1d9bf0;
+  --sans: 'Chirp', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  color-scheme: dark;
 }
 
 * {
@@ -31,133 +20,127 @@
 }
 
 body {
-  width: 300px;
+  width: 320px;
   background: var(--bg);
   color: var(--text);
   font-family: var(--sans);
-  font-size: 14px;
+  font-size: 15px;
   -webkit-font-smoothing: antialiased;
 }
 
 header {
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--hairline);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
 }
-
-.wordmark {
-  font-weight: 600;
-  letter-spacing: -0.01em;
+header svg {
+  width: 22px;
+  height: 22px;
+  fill: var(--text);
 }
-.wordmark b {
-  color: var(--accent);
-}
-
-.version {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--text-faint);
+header .version {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
 }
 
 section {
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--hairline);
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
 }
 section:last-of-type {
   border-bottom: 0;
 }
 
 h2 {
-  font-size: 11px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-faint);
-  margin-bottom: 10px;
+  padding: 8px 16px 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
 }
 
 label.row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 7px 0;
+  gap: 14px;
+  padding: 10px 16px;
   cursor: pointer;
+  transition: background 120ms ease;
 }
-
+label.row:hover {
+  background: var(--elevated);
+}
 label.row span {
-  font-size: 13px;
+  font-size: 14px;
 }
 label.row .hint {
   display: block;
-  font-size: 11px;
-  color: var(--text-muted);
+  font-size: 12px;
+  color: var(--muted);
   margin-top: 2px;
 }
 
 input[type='checkbox'] {
   appearance: none;
-  flex: 0 0 34px;
-  width: 34px;
-  height: 20px;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 22px;
   border-radius: 999px;
-  background: var(--hairline);
+  background: var(--border);
   position: relative;
   cursor: pointer;
-  transition: background 120ms ease;
+  transition: background 140ms ease;
 }
 input[type='checkbox']::after {
   content: '';
   position: absolute;
   top: 3px;
   left: 3px;
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   border-radius: 999px;
-  background: var(--text-muted);
-  transition: transform 120ms ease, background 120ms ease;
+  background: #fff;
+  transition: transform 140ms ease;
 }
 input[type='checkbox']:checked {
   background: var(--accent);
 }
 input[type='checkbox']:checked::after {
-  transform: translateX(14px);
-  background: #17171a;
+  transform: translateX(18px);
+}
+input[type='checkbox']:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
-.segmented {
+.surfaces {
   display: flex;
-  border: 1px solid var(--hairline);
-  border-radius: 6px;
-  overflow: hidden;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 16px 12px;
 }
-.segmented button {
-  flex: 1;
-  padding: 7px 0;
-  background: none;
-  border: 0;
-  border-right: 1px solid var(--hairline);
-  color: var(--text-muted);
-  font-family: var(--sans);
+.surfaces span {
   font-size: 12px;
-  cursor: pointer;
-}
-.segmented button:last-child {
-  border-right: 0;
-}
-.segmented button[aria-pressed='true'] {
-  background: var(--surface);
-  color: var(--text);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 9px;
 }
 
 footer {
   padding: 12px 16px;
-  font-size: 11px;
-  color: var(--text-faint);
+  font-size: 12px;
   line-height: 1.5;
+  color: var(--muted);
 }
 footer a {
-  color: var(--text-muted);
+  color: var(--accent);
+  text-decoration: none;
+}
+footer a:hover {
+  text-decoration: underline;
 }

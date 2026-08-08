@@ -17,19 +17,24 @@ Read `DESIGN.md` before any visual change. Colour, typography, spacing and motio
 ## Layering
 
 ```
-src/host/     the only LinkedIn-aware code
+src/host/     the only LinkedIn-aware code, one reader per surface
 src/filter/   pure: RawPost -> PostKind
 src/model/    pure: RawPost -> Post
-src/state/    signals store, optimistic updates, kill switch
-src/ui/       Preact inside a shadow root
+src/state/    signals stores, optimistic updates, kill switch
+src/ui/kit/   the component layer: Row, Avatar, Button, Chip, Tabs, …
+src/ui/       one view per surface, composed from the kit
 ```
+
+**The second rule:** surfaces set no spacing of their own. Padding, gutters,
+dividers, hover and focus live in `src/ui/kit.css`. A surface that writes its
+own `padding` is how the screens drifted apart the first time.
 
 Nothing above `src/host/` may import the DOM contract; nothing in `src/filter/` or `src/model/` may touch the DOM, globals, or async.
 
 ## Verification
 
 ```bash
-npm test         # 68 tests over fixtures in tests/fixtures/, no browser needed
+npm test         # 124 tests over fixtures in tests/fixtures/, no browser needed
 npm run typecheck
 npm run build
 ```

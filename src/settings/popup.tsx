@@ -41,11 +41,21 @@ function Popup() {
   return (
     <>
       <header>
-        <span class="wordmark">
-          linkedin<b>-x</b>
-        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 3h4.6l5 6.9L18.7 3H21l-7.2 8.4L21.4 21h-4.6l-5.4-7.4L4.7 21H2.4l7.7-9z" />
+        </svg>
+        <strong>linkedin-x</strong>
         <span class="version">v{version}</span>
       </header>
+
+      <section>
+        <h2>Surfaces replaced</h2>
+        <div class="surfaces">
+          {['Feed', 'Search', 'Post', 'Jobs', 'Network', 'Profile'].map((s) => (
+            <span key={s}>{s}</span>
+          ))}
+        </div>
+      </section>
 
       <section>
         <Toggle
@@ -80,7 +90,7 @@ function Popup() {
       </section>
 
       <footer>
-        Feed looks broken?{' '}
+        Looks broken?{' '}
         <a href="https://github.com/Ilmak17/linkedin-x/issues/new?template=selector-break.yml" target="_blank" rel="noreferrer">
           report it
         </a>{' '}

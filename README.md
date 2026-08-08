@@ -4,9 +4,9 @@
 
 # linkedin-x
 
-**A browser extension that replaces the LinkedIn home feed with a calm, reader-focused timeline.**
+**A browser extension that rebuilds LinkedIn as x.com.**
 
-Posts from people you follow, set in a serif, one column, no ads, no "someone you barely know commented on this", no job carousels. Everything you can do on LinkedIn still works, because underneath it *is* LinkedIn.
+Six surfaces — feed, search, post, jobs, network, profile — in x's three-column dark shell, with the ads and the noise filtered out. Everything you can do on LinkedIn still works, because underneath it *is* LinkedIn.
 
 [Install](#install) · [How it works](#how-it-works) · [When LinkedIn breaks it](#when-linkedin-breaks-it) · [Contributing](CONTRIBUTING.md)
 
@@ -26,14 +26,22 @@ linkedin-x takes a third path: keep LinkedIn's feed running as the engine, draw 
 
 ## What you get
 
-- **One column, 600px, hairlines instead of cards.** No sidebars, no "People also viewed", no shadows.
-- **Post text set in a serif.** The single change that makes a LinkedIn post read like writing instead of ad copy.
-- **Ads and noise gone by default.** Promoted posts, "X commented on this", "People you may know", job carousels and polls are filtered out. Each category can be switched back on.
-- **Every action still works.** Like, comment, repost and save all work from the new UI, with optimistic updates.
-- **Dark by default**, light theme included, `prefers-reduced-motion` respected.
-- **It gets out of the way when it breaks.** If we cannot read the feed, we say so and hand you the original.
+| Surface | Path | What it does |
+|---|---|---|
+| Feed | `/feed` | Timeline with ads, suggestions and modules filtered out |
+| Post | `/feed/update/*`, in-app | A post on its own page with its replies |
+| Search | `/search/results/*` | Results as a timeline, searched from inside the app |
+| Jobs | `/jobs/search*`, `/jobs/collections/*` | Results, filters, and the description in-app |
+| Network | `/mynetwork/*` | Suggestions, connect through LinkedIn's own button |
+| Profile | `/in/*` | Top card and about, with follow and connect |
 
-Design decisions and the full token set live in [DESIGN.md](DESIGN.md). Open [docs/design-preview.html](docs/design-preview.html) in a browser to see the system rendered.
+- **x's shell.** 275px rail, 600px timeline, 350px rail, dark only.
+- **Noise gone by default.** Ads, "people you may know", carousels and polls. Each switchable in the right rail.
+- **Actions still work.** Like, comment, repost, save, connect, follow — all by clicking LinkedIn's own controls.
+- **Keyboard.** `j` `k` move, `l` like, `s` save, `enter` opens replies, `/` searches.
+- **It gets out of the way when it breaks.** If a surface cannot be read, it says so and hands you the original.
+
+Design decisions and the token set live in [DESIGN.md](DESIGN.md). Architecture is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Install
 
@@ -99,7 +107,7 @@ Two things are built for that day:
 
    It reports which markup generation matched, which selector variant matched for every field, how many list items were skipped as modules, and which fields came back empty. Paste that into a [selector break report](https://github.com/Ilmak17/linkedin-x/issues/new?template=selector-break.yml) and the fix is usually a one-line addition to `src/host/selectors.ts`.
 
-Every selector in the project lives in that one file, as an ordered list of candidates: server-driven attributes first, legacy Ember classes second, a loose structural fallback last. Both generations are supported, because LinkedIn still serves the old one to some members. Fixing a break does not require understanding the rest of the codebase.
+Every selector for the feed lives in that one file, as an ordered list of candidates: server-driven attributes first, legacy Ember classes second, a loose structural fallback last. Both generations are supported, because LinkedIn still serves the old one to some members. Fixing a break does not require understanding the rest of the codebase.
 
 ## Settings
 
@@ -118,7 +126,7 @@ Click the toolbar icon.
 
 ```bash
 npm run dev        # rebuild the content script on change
-npm test           # 68 tests, no browser needed
+npm test           # 124 tests, no browser needed
 npm run typecheck
 ```
 
