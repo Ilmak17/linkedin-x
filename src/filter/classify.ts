@@ -25,7 +25,11 @@ export interface Settings {
 
 export const DEFAULT_SETTINGS: Settings = {
   showPromoted: false,
-  showSocialProof: false,
+  // On by default, unlike the other three. A post surfaced because a
+  // connection reacted to it is still a post a person wrote; the noise is the
+  // "X likes this" header, and we do not render headers at all. Hiding the
+  // whole post was throwing away most of a real feed.
+  showSocialProof: true,
   showSuggested: false,
   showModules: false,
 }

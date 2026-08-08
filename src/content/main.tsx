@@ -2,7 +2,7 @@ import { render } from 'preact'
 import styles from '../ui/styles.css?inline'
 import { fontFaceCss } from '../ui/fonts'
 import { DomHost } from '../host/dom-host'
-import { attachHost, ingest, markBroken, settings } from '../state/store'
+import { attachHost, ingest, markBroken, settings, warmingUp } from '../state/store'
 import { loadSettings, onSettingsChanged, type AppSettings, type Theme } from '../lib/settings'
 import { App } from '../ui/App'
 
@@ -85,6 +85,7 @@ function mount(): void {
 function startWarmUp(): void {
   let tries = 0
   stopWarmUp()
+  warmingUp.value = true
 
   warmUpTimer = window.setInterval(() => {
     tries++
@@ -93,12 +94,14 @@ function startWarmUp(): void {
     if (posts.length > 0) {
       ingest(posts)
       publishDoctor()
+      warmingUp.value = false
       stopWarmUp()
       return
     }
 
     if (tries >= WARMUP_TRIES) {
       stopWarmUp()
+      warmingUp.value = false
       publishDoctor()
       const { listItemsInFeed, feedRootFound } = host.doctor()
       if (listItemsInFeed > 0) {

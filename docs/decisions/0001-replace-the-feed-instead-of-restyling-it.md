@@ -15,7 +15,7 @@ The Modern-for-HN approach does not transfer. Hacker News is static HTML with cl
 
 **A. CSS skin over the native DOM.** Cheap. Actions work for free. But the layout ceiling is LinkedIn's own DOM shape, and obfuscated class names make it break constantly. Rejected: it cannot deliver the product.
 
-**B. Own render, actions proxied to the native DOM.** Read posts from the native DOM through whatever stable handles it exposes, render our own timeline in a shadow root, and perform actions by clicking LinkedIn's own buttons. Full design freedom, full action set, no API reverse engineering, no CSRF handling, and nothing that looks unlike a person using the site. **Chosen.**
+**B. Own render, actions proxied to the native DOM.** Read posts from the native DOM through whatever stable handles it exposes, render our own timeline in a shadow root, and perform actions by clicking LinkedIn's own buttons. Full design freedom, full action set, no API reverse engineering and no CSRF handling. **Chosen.**
 
 **C. Intercept LinkedIn's JSON and call its API directly.** Patch `fetch`/XHR, read the server-driven UI payload, render from clean structured data, and send actions straight to Voyager with the csrf token from the `JSESSIONID` cookie. Best data quality by far. Also the most work: the SDUI schema is large and moves, every action endpoint needs separate reverse engineering, and direct API calls are the easiest thing for anti-abuse systems to flag. Rejected for now.
 
@@ -44,7 +44,8 @@ Bad, and accepted:
 - The server-driven markup dropped the activity urn, so permalinks are gone. Option C would get them back.
 - LinkedIn keeps downloading media for posts we never display. A later version can null out `img.src` after parsing.
 - Repost and save go through a dropdown rendered in a portal, matched by visible text per locale. This is the most fragile part of the extension.
-- The extension is visible to LinkedIn and always will be. That is deliberate: it does what a user asked, when they asked.
+- **Actions are detectable, and an earlier version of this document implied otherwise.** A synthesised click is flagged `isTrusted: false` by the browser and no extension can forge it, so LinkedIn can tell our clicks from the user's with a one-line check. Option C would not fix this either; it would look *more* like automation, not less. The only design that removes the signal is not acting at all, which is why the action toggles exist.
+- The extension is visible to LinkedIn and always will be. That is deliberate: it does what a user asked, when they asked, and it will not be given evasion features.
 
 ## Revisit when
 

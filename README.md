@@ -70,7 +70,9 @@ LinkedIn's own feed (untouched, running normally, covered by our overlay)
 
 **Why we cover instead of hide.** `display: none` on the feed would stop LinkedIn's virtualisation, lazy image loading and IntersectionObserver-driven pagination, which are exactly the machinery we depend on. So the native feed keeps its normal layout and we draw a fixed, opaque overlay on top of it. Infinite scroll works by scrolling the window underneath us, which triggers LinkedIn's own pagination.
 
-**Why we click instead of calling the API.** Liking a post means finding LinkedIn's like button and clicking it. No CSRF tokens, no reverse-engineered endpoints, nothing that looks different from a person using the site. It also means we get LinkedIn's own error handling for free.
+**Why we click instead of calling the API.** Liking a post means finding LinkedIn's like button and clicking it. No CSRF tokens, no reverse-engineered endpoints, and LinkedIn's own error handling applies for free.
+
+This is **not** the same as being indistinguishable from a person, and an earlier version of this README wrongly claimed it was. A synthesised click carries `isTrusted: false`, and no extension can forge that flag; a single line of LinkedIn's JavaScript can tell our actions from yours. Reading the feed is effectively undetectable, because there is no API that reports what a script read. Acting is not. See [the risk section](#a-caveat-worth-stating-plainly).
 
 **Why `src/host/` matters.** Everything above that interface is ordinary application code. When LinkedIn ships a redesign, one directory changes. A second implementation that reads LinkedIn's JSON responses instead of its DOM can be dropped in without touching a line of UI.
 
@@ -132,7 +134,13 @@ It makes no network requests. Fonts are bundled, not fetched. There is no analyt
 
 ## A caveat worth stating plainly
 
-This is an unofficial extension that reads and drives a website LinkedIn owns. It does not scrape data, store anything about posts, or automate anything you did not click. But it is not endorsed by LinkedIn, and LinkedIn's User Agreement gives them broad discretion over automated interaction with their service. Use it because you want a calmer feed, and know what it is.
+This is an unofficial extension that reads and drives a website LinkedIn owns. It makes no network requests, scrapes nothing, stores nothing about posts, and never acts unless you click.
+
+Two honest risks, in order of seriousness.
+
+**Actions are detectable.** Like, comment, repost and save work by clicking LinkedIn's own buttons, and a synthesised click is flagged `isTrusted: false` by the browser. LinkedIn can distinguish those from yours trivially, if it looks. LinkedIn's User Agreement prohibits automated methods of accessing the service, so this is squarely against their terms. Whether it leads to any consequence on an account is not something this project can tell you; treat unsourced claims either way with suspicion, including reassuring ones. If that risk is not worth a nicer feed to you, switch the action toggles off in the popup and use it as a reader — reading is the part that is effectively undetectable.
+
+**Reading is a grey area.** The extension reads the page the way a screen reader does, which is hard to detect and hard to object to. It also adds one element to the page, which is not hidden and is not meant to be. This project will not add anything designed to evade detection.
 
 ## Prior art
 

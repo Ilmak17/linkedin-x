@@ -62,11 +62,20 @@ describe('classify', () => {
 })
 
 describe('shouldShow', () => {
-  it('shows organic posts and nothing else by default', () => {
+  it('shows posts people wrote, and hides what LinkedIn injected', () => {
+    // Social proof is shown by default: "X likes this" is a header we never
+    // render, but the post underneath it is a real post by a real person.
+    // Hiding those was filtering out most of a real feed.
     expect(shouldShow('organic', DEFAULT_SETTINGS)).toBe(true)
-    for (const kind of ['promoted', 'social-proof', 'suggested', 'module'] as PostKind[]) {
+    expect(shouldShow('social-proof', DEFAULT_SETTINGS)).toBe(true)
+
+    for (const kind of ['promoted', 'suggested', 'module'] as PostKind[]) {
       expect(shouldShow(kind, DEFAULT_SETTINGS)).toBe(false)
     }
+  })
+
+  it('lets social proof be hidden for anyone who does want it gone', () => {
+    expect(shouldShow('social-proof', { ...DEFAULT_SETTINGS, showSocialProof: false })).toBe(false)
   })
 
   it('honours an opt-in', () => {

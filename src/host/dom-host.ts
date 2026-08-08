@@ -101,9 +101,15 @@ export class DomHost implements HostFeed {
   async loadMore(): Promise<Result<number>> {
     const before = this.#postElements().length
 
-    // LinkedIn paginates when its sentinel enters the viewport. Our overlay
-    // scrolls independently, so the window never moves on its own; move it.
-    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' as ScrollBehavior })
+    // LinkedIn paginates when its sentinel enters its scroll port. Our overlay
+    // scrolls independently, so nothing moves underneath us unless we move it.
+    //
+    // It is not the window: LinkedIn sets `overflow: hidden` on body and does
+    // its own scrolling inside `main`, so `window.scrollTo` is a silent no-op
+    // and the feed never asks for another page.
+    const scroller = this.#scroller()
+    if (scroller instanceof Element) scroller.scrollTop = scroller.scrollHeight
+    else window.scrollTo({ top: document.documentElement.scrollHeight })
 
     const showMore = findClickableByText(document, ['show more feed updates', 'показать больше', 'daha fazla'])
     showMore?.click()
@@ -150,6 +156,7 @@ export class DomHost implements HostFeed {
     return {
       feedRootFound: Boolean(root),
       postsFound: posts.length,
+      scrollerFound: this.#scroller() !== window,
       generation: posts[0] ? (isLegacy(posts[0]) ? 'legacy' : 'sdui') : 'unknown',
       listItemsInFeed: root ? root.querySelectorAll('[role="listitem"]').length : 0,
       hits: selectorHits(),
@@ -161,6 +168,20 @@ export class DomHost implements HostFeed {
   }
 
   // --- internals ---------------------------------------------------------
+
+  /**
+   * The element that actually scrolls the feed. Found by walking up from the
+   * feed root rather than hard-coded, so it survives LinkedIn moving it.
+   */
+  #scroller(): Element | Window {
+    let el = queryOne(document, 'feedRoot')
+    while (el && el !== document.documentElement) {
+      const style = getComputedStyle(el)
+      if (/auto|scroll/.test(style.overflowY) && el.scrollHeight > el.clientHeight + 20) return el
+      el = el.parentElement
+    }
+    return window
+  }
 
   #postElements(): Element[] {
     const root = queryOne(document, 'feedRoot') ?? document
@@ -483,15 +504,31 @@ export function firstTimeToken(raw: string): string {
   return normalizeWhitespace((raw.split(/[•·]/)[0] ?? '').trim())
 }
 
-/** Strips LinkedIn's "…more" toggle, which sits inside the text element. */
+/**
+ * The post's text, with its paragraphs intact.
+ *
+ * LinkedIn separates paragraphs with `<br>` rather than block elements, and
+ * `textContent` drops those, which runs every paragraph of a long post into
+ * one wall of prose. So the breaks are turned into real newlines first.
+ */
 export function cleanBodyText(bodyEl: Element): string {
   const clone = bodyEl.cloneNode(true) as Element
   clone
     .querySelectorAll('button, [data-testid="expandable-text-button"], .visually-hidden, [class*="see-more-less"]')
     .forEach((n) => n.remove())
+
+  // Mark the breaks, collapse everything else, then restore them. Turning
+  // <br> straight into "\n" is not enough: newlines in the HTML source are
+  // just formatting and would become paragraph breaks that were never there.
+  const MARK = '\u0000br\u0000'
+  clone.querySelectorAll('br').forEach((br) => br.replaceWith(MARK))
+
   return (clone.textContent ?? '')
-    .replace(/ /g, ' ')
-    .replace(/[ \t]+/g, ' ')
+    .replace(/\u00a0/g, ' ')
+    .replace(/\s+/g, ' ')
+    .split(MARK)
+    .map((part) => part.trim())
+    .join('\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim()
 }

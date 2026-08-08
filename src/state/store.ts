@@ -14,6 +14,8 @@ export type Toast = { id: number; text: string }
 export const settings = signal<AppSettings>(DEFAULTS)
 export const allPosts = signal<Post[]>([])
 export const loadingMore = signal(false)
+/** True while the feed is still hydrating, so the UI shows skeletons not an empty state. */
+export const warmingUp = signal(true)
 export const toasts = signal<Toast[]>([])
 export const openThread = signal<string | null>(null)
 

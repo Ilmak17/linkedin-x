@@ -20,7 +20,7 @@ This extension runs with access to a logged-in LinkedIn session, so the interest
 
 - LinkedIn's own vulnerabilities. Report those to [LinkedIn](https://www.linkedin.com/help/linkedin/answer/a1340557).
 - Selectors breaking after a LinkedIn redesign. That is a bug, not a vulnerability: use the [selector break template](https://github.com/Ilmak17/linkedin-x/issues/new?template=selector-break.yml).
-- The extension being visible to LinkedIn. It runs in the page and does not try to hide.
+- The extension being visible to LinkedIn. It runs in the page and does not try to hide, and requests to make it harder to detect will be declined.
 - Terms-of-service concerns. Real, but not a security issue; see the caveat in the README.
 
 ## Supported versions

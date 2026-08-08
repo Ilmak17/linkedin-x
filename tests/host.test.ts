@@ -58,8 +58,15 @@ describe('server-driven markup', () => {
   })
 
   it('strips the "…more" toggle out of the body', () => {
-    expect(posts[0]!.text).toBe('We deleted our retry layer and p99 dropped 40%.')
     expect(posts[0]!.text).not.toContain('more')
+  })
+
+  it('keeps paragraphs, which LinkedIn writes as <br> and textContent throws away', () => {
+    // Without this the whole post collapses into one wall of prose, and long
+    // posts become unreadable: "…dropped 40%.Most of our transient failures…"
+    expect(posts[0]!.text).toBe(
+      'We deleted our retry layer and p99 dropped 40%.\n\nMost of our transient failures were self-inflicted.',
+    )
   })
 
   it('reads counters written as sentences', () => {

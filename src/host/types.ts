@@ -85,6 +85,8 @@ export interface DoctorReport {
   generation: 'sdui' | 'legacy' | 'unknown'
   /** Total listitems in the feed, including modules we deliberately skip. */
   listItemsInFeed: number
+  /** Whether we located LinkedIn's own scroll container; pagination needs it. */
+  scrollerFound: boolean
   /** Selector variants that matched, and at which position in the candidate list. */
   hits: Array<{ key: string; index: number; selector: string }>
   /** Fields we failed to read on a majority of posts. */
