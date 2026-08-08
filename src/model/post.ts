@@ -1,9 +1,10 @@
 import { classify, type PostKind } from '../filter/classify'
 import type { RawPost } from '../host/types'
+import { permalinkFrom } from '../host/selectors'
 
 /** What the UI renders. Nothing in here knows LinkedIn exists. */
 export interface Post {
-  urn: string
+  id: string
   kind: PostKind
   author: {
     name: string
@@ -19,13 +20,17 @@ export interface Post {
   linkTitle: string | null
   stats: { reactions: number; comments: number; reposts: number }
   viewer: { liked: boolean; saved: boolean }
-  /** LinkedIn's own permalink, for "open the original". */
-  permalink: string
+  /**
+   * LinkedIn's permalink for the post, when one can be derived. The
+   * server-driven markup carries no activity urn, so this is usually null and
+   * the UI falls back to plain text where it would otherwise link out.
+   */
+  permalink: string | null
 }
 
 export function normalize(raw: RawPost): Post {
   return {
-    urn: raw.urn,
+    id: raw.id,
     kind: classify(raw),
     author: {
       name: raw.authorName || 'LinkedIn member',
@@ -41,7 +46,7 @@ export function normalize(raw: RawPost): Post {
     linkTitle: raw.linkTitle,
     stats: { reactions: raw.reactions, comments: raw.comments, reposts: raw.reposts },
     viewer: { liked: raw.liked, saved: false },
-    permalink: permalinkFor(raw.urn),
+    permalink: permalinkFrom(raw.id),
   }
 }
 
@@ -51,11 +56,6 @@ export function initialsOf(name: string): string {
   const first = parts[0]![0] ?? ''
   const last = parts.length > 1 ? (parts[parts.length - 1]![0] ?? '') : ''
   return (first + last).toUpperCase()
-}
-
-export function permalinkFor(urn: string): string {
-  const id = urn.split(':').pop() ?? ''
-  return `https://www.linkedin.com/feed/update/urn:li:activity:${id}/`
 }
 
 /** 1234 -> "1.2k". Keeps counters one token wide so the column never jumps. */

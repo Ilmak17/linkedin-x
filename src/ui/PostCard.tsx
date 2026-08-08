@@ -9,8 +9,13 @@ const CLAMP_AT = 900 // characters, roughly twelve lines at 17px/1.6
 
 export function PostCard({ post }: { post: Post }) {
   const [expanded, setExpanded] = useState(false)
-  const threadOpen = openThread.value === post.urn
+  const threadOpen = openThread.value === post.id
   const long = post.text.length > CLAMP_AT
+
+  // The server-driven feed carries no activity urn, so most posts have no
+  // derivable permalink. Where there is none, the time and media stay plain
+  // rather than becoming dead links.
+  const link = post.permalink
 
   return (
     <article class="post">
@@ -22,9 +27,13 @@ export function PostCard({ post }: { post: Post }) {
             {post.author.name}
           </a>
           <span class="headline">{post.author.headline}</span>
-          <a class="time" href={post.permalink} target="_blank" rel="noreferrer noopener" title="Open on LinkedIn">
-            {post.timeLabel}
-          </a>
+          {link ? (
+            <a class="time" href={link} target="_blank" rel="noreferrer noopener" title="Open on LinkedIn">
+              {post.timeLabel}
+            </a>
+          ) : (
+            <span class="time">{post.timeLabel}</span>
+          )}
         </div>
 
         {post.text && <div class={`text${long && !expanded ? ' clamped' : ''}`}>{post.text}</div>}
@@ -34,29 +43,26 @@ export function PostCard({ post }: { post: Post }) {
           </button>
         )}
 
-        {post.imageUrl && (
-          <a class="media" href={post.permalink} target="_blank" rel="noreferrer noopener">
-            <img src={post.imageUrl} alt="" loading="lazy" />
-          </a>
-        )}
+        {post.imageUrl &&
+          (link ? (
+            <a class="media" href={link} target="_blank" rel="noreferrer noopener">
+              <img src={post.imageUrl} alt="" loading="lazy" />
+            </a>
+          ) : (
+            <div class="media">
+              <img src={post.imageUrl} alt="" loading="lazy" />
+            </div>
+          ))}
 
-        {post.hasVideo && (
-          <a class="linkcard" href={post.permalink} target="_blank" rel="noreferrer noopener">
-            video · open on LinkedIn
-          </a>
-        )}
-
-        {post.linkTitle && !post.imageUrl && (
-          <a class="linkcard" href={post.permalink} target="_blank" rel="noreferrer noopener">
-            {post.linkTitle}
-          </a>
+        {(post.hasVideo || post.linkTitle) && (
+          <div class="linkcard">{post.hasVideo ? 'video' : post.linkTitle} · open on LinkedIn to view</div>
         )}
 
         <ActionBar
           post={post}
           threadOpen={threadOpen}
           onToggleThread={() => {
-            openThread.value = threadOpen ? null : post.urn
+            openThread.value = threadOpen ? null : post.id
           }}
         />
 

@@ -92,7 +92,7 @@ export function App() {
         )}
 
         {posts.map((p) => (
-          <PostCard post={p} key={p.urn} />
+          <PostCard post={p} key={p.id} />
         ))}
 
         <div ref={sentinel} />

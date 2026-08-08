@@ -12,7 +12,8 @@ import type { Result } from '../lib/result'
 
 /** Raw, un-classified data scraped straight off the page. */
 export interface RawPost {
-  urn: string
+  /** Stable identity: a componentkey token, or an activity urn on legacy markup. */
+  id: string
   authorName: string
   authorHeadline: string
   authorUrl: string
@@ -65,10 +66,10 @@ export interface HostFeed {
   loadMore(): Promise<Result<number>>
 
   /** Perform an action by driving LinkedIn's own controls. */
-  act(urn: string, action: PostAction): Promise<Result<void>>
+  act(id: string, action: PostAction): Promise<Result<void>>
 
   /** Expand and read a post's comment thread. */
-  comments(urn: string): Promise<Result<RawComment[]>>
+  comments(id: string): Promise<Result<RawComment[]>>
 
   /** Move the native feed offscreen (or back). */
   stage(hidden: boolean): void
@@ -80,6 +81,10 @@ export interface HostFeed {
 export interface DoctorReport {
   feedRootFound: boolean
   postsFound: number
+  /** Which markup generation we matched. */
+  generation: 'sdui' | 'legacy' | 'unknown'
+  /** Total listitems in the feed, including modules we deliberately skip. */
+  listItemsInFeed: number
   /** Selector variants that matched, and at which position in the candidate list. */
   hits: Array<{ key: string; index: number; selector: string }>
   /** Fields we failed to read on a majority of posts. */

@@ -2,7 +2,7 @@
 
 ## Reporting a vulnerability
 
-Use GitHub's private vulnerability reporting: **Security → Report a vulnerability** on <https://github.com/ilmak/linkedin-x>. Do not open a public issue for a security problem.
+Use GitHub's private vulnerability reporting: **Security → Report a vulnerability** on <https://github.com/Ilmak17/linkedin-x>. Do not open a public issue for a security problem.
 
 Expect an acknowledgement within a week. If a fix is warranted it will ship as a patch release with the reporter credited, unless you prefer otherwise.
 
@@ -19,7 +19,7 @@ This extension runs with access to a logged-in LinkedIn session, so the interest
 ## What is not in scope
 
 - LinkedIn's own vulnerabilities. Report those to [LinkedIn](https://www.linkedin.com/help/linkedin/answer/a1340557).
-- Selectors breaking after a LinkedIn redesign. That is a bug, not a vulnerability: use the [selector break template](https://github.com/ilmak/linkedin-x/issues/new?template=selector-break.yml).
+- Selectors breaking after a LinkedIn redesign. That is a bug, not a vulnerability: use the [selector break template](https://github.com/Ilmak17/linkedin-x/issues/new?template=selector-break.yml).
 - The extension being visible to LinkedIn. It runs in the page and does not try to hide.
 - Terms-of-service concerns. Real, but not a security issue; see the caveat in the README.
 

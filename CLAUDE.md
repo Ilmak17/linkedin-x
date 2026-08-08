@@ -8,7 +8,7 @@ A Chrome MV3 extension that replaces the LinkedIn home feed. LinkedIn's own feed
 
 **No LinkedIn CSS selector, class name, or `aria-label` string may appear outside `src/host/selectors.ts`.**
 
-If you need one, add a key to `SELECTORS` and reach it through `queryOne` / `queryAll` / `visibleTextOf`. This is what keeps a LinkedIn redesign a one-line fix instead of a rewrite. Selector lists are ordered: server-driven UI attributes first, legacy Ember classes second, loose structural fallback last. Add new selectors to the front; never delete old ones.
+If you need one, add a key to `SELECTORS` and reach it through `queryOne` / `queryAll` / `visibleTextOf`. This is what keeps a LinkedIn redesign a one-line fix instead of a rewrite. Selector lists are ordered: server-driven attributes first, legacy Ember classes second, loose structural fallback last. Class names are content hashes and must never be matched on. Add new selectors to the front; never delete old ones.
 
 ## Design system
 
@@ -29,7 +29,7 @@ Nothing above `src/host/` may import the DOM contract; nothing in `src/filter/` 
 ## Verification
 
 ```bash
-npm test         # 52 tests over fixtures in tests/fixtures/, no browser needed
+npm test         # 62 tests over fixtures in tests/fixtures/, no browser needed
 npm run typecheck
 npm run build
 ```

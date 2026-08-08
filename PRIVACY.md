@@ -43,4 +43,4 @@ If a future version ever needs a network request or an additional permission, it
 
 ## Contact
 
-Open an issue: <https://github.com/ilmak/linkedin-x/issues>
+Open an issue: <https://github.com/Ilmak17/linkedin-x/issues>

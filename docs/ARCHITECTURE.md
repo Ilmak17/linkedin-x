@@ -38,8 +38,8 @@ Nothing below `src/host/` imports anything above it, and nothing above it import
 ```ts
 harvest(): RawPost[]
 observe(cb): () => void
-act(urn, action): Promise<Result<void>>
-comments(urn): Promise<Result<RawComment[]>>
+act(id, action): Promise<Result<void>>
+comments(id): Promise<Result<RawComment[]>>
 ```
 
 A second implementation that patches `fetch` and reads LinkedIn's server-driven UI JSON would satisfy the same interface. The UI would not notice.
@@ -62,7 +62,7 @@ Our overlay scrolls independently, so the window never moves, so LinkedIn's pagi
 
 ### Actions are clicks, not requests
 
-`act()` finds the post by its `urn:li:activity:…` identifier, finds LinkedIn's own control inside it, and clicks. Then it waits for LinkedIn to confirm: `aria-pressed` flipping, the comment editor emptying, the thread appearing. If confirmation does not arrive inside the timeout, the action fails with `ACTION_TIMEOUT` and the store rolls its optimistic update back.
+`act()` finds the post by its identity token, finds LinkedIn's own control inside it, and clicks. Then it waits for LinkedIn to confirm: `aria-pressed` flipping, the comment editor emptying, the thread appearing. If confirmation does not arrive inside the timeout, the action fails with `ACTION_TIMEOUT` and the store rolls its optimistic update back.
 
 Repost and save need one more step, because LinkedIn puts them behind a dropdown rendered in a portal outside the post element. We open the menu, find the item by its text in any of several languages, and click it. This is the most fragile part of the extension and the first thing to check when something stops working.
 
@@ -73,7 +73,7 @@ native DOM
   → harvest()            RawPost[]      raw strings and counts
   → classify()           PostKind       organic | promoted | social-proof | suggested | module
   → normalize()          Post           what the UI renders
-  → store.ingest()                      merged by urn, LinkedIn's ordering preserved,
+  → store.ingest()                      merged by id, LinkedIn's ordering preserved,
                                         our optimistic viewer state kept
   → visiblePosts         computed       filtered by settings
   → <PostCard>
@@ -102,7 +102,26 @@ Above that sits the kill switch: if `isReady()` is true (a feed container exists
 | `DomHost.harvest`, `doctor` | happy-dom over saved HTML fixtures | proves selectors match real markup without a LinkedIn account |
 | `act`, `comments`, `loadMore` | manual checklist in CONTRIBUTING.md | needs a live session; fixtures cannot fake LinkedIn's confirmation behaviour |
 
-Fixtures are captured with `copy(document.querySelector(…).outerHTML)` and scrubbed of names, URNs and profile URLs before being committed.
+Fixtures are captured with `copy(document.querySelector('[data-testid="mainFeed"]').outerHTML)` and scrubbed of names, identity tokens and profile URLs before being committed.
+
+## Identity, and what the migration cost us
+
+The legacy markup put `data-urn="urn:li:activity:<id>"` on every post, which gave both a stable identity and a permalink for free. The server-driven markup has no activity urn anywhere in the DOM. Identity now comes from the post root's `componentkey`, which reads `expanded<TOKEN>FeedType_MAIN_FEED_RELEVANCE`; the token is stable while the post is mounted, which is all the store needs.
+
+The permalink is simply gone. `Post.permalink` is nullable and the UI degrades to plain text where it used to link out. Recovering it would mean opening each post's control menu and reading "Copy link to post", which is far too expensive to do at render time.
+
+## Reading a post without selectors
+
+Below the few stable attributes there is nothing to match on, so the actor block is read structurally. `leafTexts` walks the post and collects each element's own text nodes in document order, which for a typical post yields:
+
+```
+["Feed post", "Ada Example", "• 1st", "Staff Engineer, …", "9h •",
+ "Grace and 82 others reacted", "25 comments", "Like", "Comment", …]
+```
+
+The name comes from the profile link that shares the avatar's `href` — not the first link with text, because a post prefixed by social proof ("Grace, and 5 other connections follow this Page") links those connections first. The headline is the next usable leaf after the name, skipping the connection badge, counters, chrome strings, and anything that is itself a profile link, which is what a repost inserts between the author and the headline. Counters read as sentences, so "Grace and 82 others reacted" is 83 people, not 82.
+
+Each of those rules exists because the obvious version got the wrong answer on a real feed. They are covered by fixtures in `tests/fixtures/feed-sdui.html`.
 
 ## What is deliberately not here
 

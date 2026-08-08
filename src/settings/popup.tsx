@@ -94,7 +94,7 @@ function Popup() {
 
       <footer>
         Feed looks broken?{' '}
-        <a href="https://github.com/ilmak/linkedin-x/issues/new?template=selector-break.yml" target="_blank" rel="noreferrer">
+        <a href="https://github.com/Ilmak17/linkedin-x/issues/new?template=selector-break.yml" target="_blank" rel="noreferrer">
           report it
         </a>{' '}
         and paste the output of <code>__linkedinX.doctor()</code> from the console.

@@ -3,7 +3,7 @@ import { classify, DEFAULT_SETTINGS, shouldShow, type PostKind } from '../src/fi
 import type { RawPost } from '../src/host/types'
 
 const post = (markers: Partial<RawPost['markers']>): RawPost => ({
-  urn: 'urn:li:activity:1',
+  id: 'urn:li:activity:1',
   authorName: 'A',
   authorHeadline: '',
   authorUrl: '',

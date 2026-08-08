@@ -34,7 +34,7 @@ This Code of Conduct applies within all project spaces, and also applies when an
 
 ## Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the maintainers through GitHub's private report flow on <https://github.com/ilmak/linkedin-x>. All complaints will be reviewed and investigated promptly and fairly. Maintainers are obligated to respect the privacy and security of the reporter of any incident.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the maintainers through GitHub's private report flow on <https://github.com/Ilmak17/linkedin-x>. All complaints will be reviewed and investigated promptly and fairly. Maintainers are obligated to respect the privacy and security of the reporter of any incident.
 
 ## Attribution
 

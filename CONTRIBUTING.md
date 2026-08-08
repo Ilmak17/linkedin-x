@@ -29,13 +29,13 @@ If your LinkedIn is not in English and a marker word is missing, adding it to th
 Fixtures make everything else testable. To capture one:
 
 ```js
-copy(document.querySelector('.scaffold-finite-scroll__content').outerHTML)
+copy(document.querySelector('[data-testid="mainFeed"]').outerHTML)
 ```
 
 Then, **before committing**, remove:
 
 - real names, headlines and profile URLs
-- real `urn:li:activity:` ids (replace with `1000000000000000001`, `…02`, and so on)
+- real post identities: `componentkey` tokens and any `urn:li:` ids
 - real image URLs (point them at `media.example.com`)
 - anything identifying about you or the people whose posts you captured
 

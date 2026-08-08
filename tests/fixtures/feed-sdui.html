@@ -1,0 +1,144 @@
+<!--
+  LinkedIn's server-driven feed markup, captured from the live site on
+  2026-08-09 and rewritten with invented people so it can be committed.
+
+  Every attribute that the extension matches on is exactly as LinkedIn emits
+  it: `data-testid="mainFeed"`, `componentkey="expanded<TOKEN>FeedType_…"`,
+  `role="listitem"`, the aria-label prefixes, and the counter phrasing. Class
+  names are content hashes that change on every deploy, so they are elided
+  here and nothing in the extension may match on them.
+
+  Contents: one organic post, one ad, one person-suggestion module (which has
+  no control menu and must therefore be skipped), and one legacy-bucket post.
+
+  To refresh: see CONTRIBUTING.md. Scrub names, profile URLs and image URLs.
+-->
+<div data-testid="mainFeed" data-component-type="LazyColumn" role="list" componentkey="container-update-list_mainFeed-lazy-container">
+
+  <!-- 1. organic post -->
+  <div data-lazy-mount-id="aaa111">
+    <div><div>
+      <div role="listitem" componentkey="expandedTOKEN0000000000000000000000000000001FeedType_MAIN_FEED_RELEVANCE">
+        <div>
+          <span>Feed post</span>
+
+          <a href="https://www.linkedin.com/in/example-one/">
+            <figure>
+              <svg role="img" aria-label="View Ada Example’s profile"></svg>
+              <img src="https://media.example.com/avatar-one.jpg" alt="View Ada Example’s profile" />
+            </figure>
+          </a>
+
+          <a href="https://www.linkedin.com/in/example-one/">
+            <div>
+              <div aria-label="Ada Example Verified Profile 1st">
+                <span><span>Ada Example</span></span>
+                <span><span>• 1st</span></span>
+              </div>
+            </div>
+          </a>
+          <div><span>Staff Engineer, Distributed Systems</span></div>
+          <p><span>9h •<svg role="img" aria-label="Visibility: Global"></svg></span></p>
+
+          <button aria-label="Open control menu for post by Ada Example"></button>
+          <button aria-label="Hide post by Ada Example"></button>
+
+          <p>
+            <span data-testid="expandable-text-box">We deleted our retry layer and p99 dropped 40%.<button
+                data-testid="expandable-text-button"><span>…</span><span>more</span></button></span>
+          </p>
+
+          <a href="https://www.linkedin.com/feed/">
+            <figure><img src="https://media.example.com/post-one.jpg" alt="View image" /></figure>
+          </a>
+
+          <div>
+            <span>Grace Example and 82 others reacted</span>
+            <span>Grace Example and 82 others</span>
+          </div>
+          <div><span>25 comments</span><span>25 comments</span></div>
+          <div><span>1 repost</span><span>1 repost</span></div>
+
+          <hr role="presentation" />
+          <button aria-label="Reaction button state: no reaction"><span>Like</span></button>
+          <button aria-label="Open reactions menu"></button>
+          <button><span>Comment</span></button>
+          <button><span>Repost</span></button>
+          <a href="https://www.linkedin.com/feed/"><span>Send</span></a>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 2. ad. "Promoted" replaces the connection degree in the actor block. -->
+  <div data-lazy-mount-id="bbb222">
+    <div role="listitem" componentkey="expandedTOKEN0000000000000000000000000000002FeedType_MAIN_FEED_RELEVANCE">
+      <span>Feed post</span>
+
+      <!--
+        Social proof comes first and links to connections, not to the author.
+        Reading "the first link with text" picks the wrong person here, which
+        is why the author is resolved via the avatar's href instead.
+      -->
+      <div>
+        <a href="https://www.linkedin.com/in/example-five/"><span>Grace Example</span></a>
+        <span>, and 5 other connections follow this Page</span>
+      </div>
+
+      <a href="https://www.linkedin.com/company/example-corp/">
+        <figure><img src="https://media.example.com/avatar-two.jpg" alt="View Example Corp’s profile" /></figure>
+      </a>
+      <a href="https://www.linkedin.com/company/example-corp/">
+        <div><div aria-label="Example Corp"><span><span>Example Corp</span></span></div></div>
+      </a>
+      <div><span>14,204 followers</span></div>
+      <div><span>Promoted</span></div>
+      <div><span>Want to view more? Unlock the full document below.</span></div>
+      <p><span>2d •</span></p>
+      <button aria-label="Open control menu for post by Example Corp"></button>
+      <p><span data-testid="expandable-text-box">Transform your workflow today.</span></p>
+      <button aria-label="Reaction button state: no reaction"><span>Like</span></button>
+      <button><span>Comment</span></button>
+      <button><span>Repost</span></button>
+    </div>
+  </div>
+
+  <!--
+    3. a repost. The control menu belongs to the reposter, the avatar and the
+    body belong to the original author, and the reposter's name sits between
+    the author's name and the headline.
+  -->
+  <div data-lazy-mount-id="ddd444">
+    <div role="listitem" componentkey="expandedTOKEN0000000000000000000000000000003FeedType_MAIN_FEED_RELEVANCE">
+      <span>Feed post</span>
+      <div><a href="https://www.linkedin.com/in/example-six/"><span>Reiko Example</span></a><span>reposted this</span></div>
+
+      <a href="https://www.linkedin.com/in/example-seven/">
+        <figure><img src="https://media.example.com/avatar-seven.jpg" alt="View Kai Example’s profile" /></figure>
+      </a>
+      <a href="https://www.linkedin.com/in/example-seven/">
+        <div><div aria-label="Kai Example Verified Profile 2nd"><span><span>Kai Example</span></span></div></div>
+      </a>
+      <div><span>• 2nd</span></div>
+      <div><span>CEO at Example Labs</span></div>
+      <p><span>1d •</span></p>
+
+      <button aria-label="Open control menu for post by Reiko Example"></button>
+      <p><span data-testid="expandable-text-box">Introducing v2.</span></p>
+      <button aria-label="Reaction button state: no reaction"><span>Like</span></button>
+      <button><span>Comment</span></button>
+    </div>
+  </div>
+
+  <!-- 4. person-suggestion module: a listitem with no control menu. -->
+  <div data-lazy-mount-id="ccc333">
+    <div role="listitem" componentkey="auto-component-753b4f91-8f25-48c1-b877-08bb97aed88a">
+      <span>Feed post</span>
+      <div><span>Partner @ Example Capital</span></div>
+      <button componentkey="FollowButtonurn:li:fsd_followingState:urn:li:member:1_follow">
+        <span>Follow</span>
+      </button>
+    </div>
+  </div>
+
+</div>

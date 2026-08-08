@@ -40,7 +40,7 @@ Design decisions and the full token set live in [DESIGN.md](DESIGN.md). Open [do
 No store listing yet. Build it and load it unpacked:
 
 ```bash
-git clone https://github.com/ilmak/linkedin-x
+git clone https://github.com/Ilmak17/linkedin-x
 cd linkedin-x
 npm install
 npm run fonts     # downloads the three bundled font families
@@ -74,6 +74,8 @@ LinkedIn's own feed (untouched, running normally, covered by our overlay)
 
 **Why `src/host/` matters.** Everything above that interface is ordinary application code. When LinkedIn ships a redesign, one directory changes. A second implementation that reads LinkedIn's JSON responses instead of its DOM can be dropped in without touching a line of UI.
 
+**What the markup actually looks like.** Verified against the live site on 2026-08-09: LinkedIn now serves a server-driven feed where every class name is a content hash (`_6ebd00b4`) that changes each deploy. Nothing here matches on class. The stable handles are `data-testid` on the feed root and post body, `componentkey` for post identity, `role="listitem"`, and `aria-label` prefixes on the action buttons. Where even those run out, posts are read structurally, by walking the text in document order and working out what each piece is.
+
 More detail in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## When LinkedIn breaks it
@@ -89,9 +91,9 @@ Two things are built for that day:
    __linkedinX.doctor()
    ```
 
-   It reports which selector variant matched for every field, which fields came back empty, and the extension version. Paste that into a [selector break report](https://github.com/ilmak/linkedin-x/issues/new?template=selector-break.yml) and the fix is usually a one-line addition to `src/host/selectors.ts`.
+   It reports which markup generation matched, which selector variant matched for every field, how many list items were skipped as modules, and which fields came back empty. Paste that into a [selector break report](https://github.com/Ilmak17/linkedin-x/issues/new?template=selector-break.yml) and the fix is usually a one-line addition to `src/host/selectors.ts`.
 
-Every selector in the project lives in that one file, as an ordered list of candidates: server-driven UI attributes first, legacy Ember classes second, a loose structural fallback last. Fixing a break does not require understanding the rest of the codebase.
+Every selector in the project lives in that one file, as an ordered list of candidates: server-driven attributes first, legacy Ember classes second, a loose structural fallback last. Both generations are supported, because LinkedIn still serves the old one to some members. Fixing a break does not require understanding the rest of the codebase.
 
 ## Settings
 
@@ -110,7 +112,7 @@ Click the toolbar icon.
 
 ```bash
 npm run dev        # rebuild the content script on change
-npm test           # 52 tests, no browser needed
+npm test           # 62 tests, no browser needed
 npm run typecheck
 ```
 

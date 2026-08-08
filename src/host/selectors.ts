@@ -4,45 +4,66 @@
  *
  * When LinkedIn ships a redesign, this file is the only one that changes.
  *
- * LinkedIn is midway through migrating the feed from its legacy Ember markup
- * (`.feed-shared-update-v2`, obfuscated class names) to a server-driven UI
- * that emits `data-testid` and `data-view-name` attributes. So every entry is
- * a list of candidates tried in order: SDUI first, legacy second, and a
- * structural fallback last. Structural fallbacks are deliberately loose; they
- * keep the extension alive with degraded data instead of blank.
+ * ## Two generations
+ *
+ * LinkedIn has migrated the feed to a server-driven UI. Verified against the
+ * live site on 2026-08-09, the current generation looks like this:
+ *
+ *   div[data-testid="mainFeed"][data-component-type="LazyColumn"]
+ *     div[data-lazy-mount-id]                      one per feed slot
+ *       …
+ *         div[role="listitem"][componentkey="expanded<TOKEN>FeedType_…"]
+ *
+ * All class names are content hashes (`_6ebd00b4`, `e3ec3fcb`) and change
+ * every deploy, so nothing here may match on class. What is stable:
+ *
+ *   - `data-testid` on the feed root, the post body and the "…more" button
+ *   - `componentkey`, which carries the post's identity token
+ *   - `role="listitem"` on the post root
+ *   - `aria-label` prefixes on the action buttons
+ *
+ * The legacy Ember markup (`.feed-shared-update-v2`, `data-urn`) is kept as a
+ * fallback because members on older buckets still get it.
+ *
+ * ## What we lost in the migration
+ *
+ * The old markup carried `data-urn="urn:li:activity:<id>"` on every post,
+ * which gave both a stable identity and a permalink. The new markup has no
+ * activity urn anywhere in the DOM. Identity now comes from `componentkey`
+ * (see `postId`), and permalinks are simply not derivable, so the UI degrades
+ * to plain text where it used to link out.
  */
 
 export type SelectorKey =
   | 'feedRoot'
   | 'post'
+  | 'postLegacy'
+  | 'controlMenu'
+  | 'hideButton'
   | 'authorLink'
-  | 'authorName'
-  | 'authorHeadline'
   | 'authorAvatar'
-  | 'timestamp'
   | 'body'
   | 'bodyExpand'
   | 'image'
   | 'video'
-  | 'articleCard'
-  | 'reactionCount'
-  | 'commentCount'
-  | 'repostCount'
+  | 'document'
   | 'likeButton'
-  | 'commentButton'
-  | 'repostButton'
-  | 'saveMenuButton'
+  | 'reactionsMenu'
   | 'commentEditor'
   | 'commentSubmit'
   | 'commentItem'
   | 'commentAuthor'
   | 'commentBody'
-  | 'promotedLabel'
-  | 'socialProofHeader'
+  // legacy-only keys, kept so old buckets still parse
+  | 'authorNameLegacy'
+  | 'authorHeadlineLegacy'
+  | 'timestampLegacy'
+  | 'reactionCountLegacy'
+  | 'commentCountLegacy'
   | 'sponsoredBadge'
+  | 'socialProofHeader'
 
 export const SELECTORS: Record<SelectorKey, readonly string[]> = {
-  // The scrolling container that holds the posts.
   feedRoot: [
     '[data-testid="mainFeed"]',
     '.scaffold-finite-scroll__content',
@@ -50,104 +71,84 @@ export const SELECTORS: Record<SelectorKey, readonly string[]> = {
     'main[aria-label]',
   ],
 
-  // A single post. Must carry a stable identity attribute; see postUrn().
+  // A post in the server-driven feed. The `expanded` prefix on componentkey is
+  // what separates real posts from the other listitems LinkedIn puts in the
+  // same list (person suggestions, module cards).
   post: [
-    '[data-testid="mainFeed"] [data-urn^="urn:li:activity"]',
+    '[role="listitem"][componentkey^="expanded"]',
+    '[componentkey^="expanded"][componentkey*="FeedType"]',
+  ],
+
+  postLegacy: [
     'div.feed-shared-update-v2[data-urn]',
     'div.feed-shared-update-v2[data-id]',
-    '[data-view-name="feed-full-update"]',
     'div[data-urn^="urn:li:activity"]',
   ],
 
+  // Doubles as the "is this actually a post" test: modules never have one.
+  // The author's name is in the label, which is also our fallback for it.
+  controlMenu: [
+    'button[aria-label^="Open control menu"]',
+    'button[data-testid="control-menu"]',
+    'button.feed-shared-control-menu__trigger',
+  ],
+  hideButton: ['button[aria-label^="Hide post"]'],
+
+  // One combined selector on purpose: `queryAll` returns the first candidate
+  // that matches anything, so listing these separately would hide every
+  // company link behind the first member link on the same post.
   authorLink: [
-    'a[data-testid="actor-link"]',
+    'a[href*="/in/"], a[href*="/company/"], a[href*="/school/"], a[href*="/newsletters/"]',
     '.update-components-actor__meta-link',
-    '.update-components-actor__container a[href*="/in/"]',
-    'a[href*="/in/"]',
   ],
-  authorName: [
-    '[data-testid="actor-name"]',
-    '.update-components-actor__title span[aria-hidden="true"]',
-    '.update-components-actor__title',
-  ],
-  authorHeadline: [
-    '[data-testid="actor-description"]',
-    '.update-components-actor__description span[aria-hidden="true"]',
-    '.update-components-actor__description',
-  ],
+  // `:not` keeps this from falling through to the post's own image when a
+  // member has no avatar set.
   authorAvatar: [
-    '[data-testid="actor-image"] img',
+    'img[alt^="View "]:not([alt="View image"])',
     '.update-components-actor__avatar img',
     '.update-components-actor img',
   ],
-  timestamp: [
-    '[data-testid="actor-sub-description"]',
-    '.update-components-actor__sub-description span[aria-hidden="true"]',
-    '.update-components-actor__sub-description',
+
+  body: ['[data-testid="expandable-text-box"]', '.update-components-text .break-words', '.update-components-text'],
+  bodyExpand: [
+    '[data-testid="expandable-text-button"]',
+    '.feed-shared-inline-show-more-text__see-more-less-toggle',
   ],
 
-  body: [
-    '[data-testid="post-text"]',
-    '.update-components-text .break-words',
-    '.feed-shared-inline-show-more-text',
-    '.update-components-text',
-  ],
-  bodyExpand: ['.feed-shared-inline-show-more-text__see-more-less-toggle', 'button.see-more'],
+  image: ['img[alt="View image"]', '.update-components-image img', '.feed-shared-image img'],
+  video: ['video'],
+  document: ['button[aria-label="Full screen"]'],
 
-  image: [
-    '[data-testid="post-image"] img',
-    '.update-components-image img',
-    '.feed-shared-image img',
-  ],
-  video: ['.update-components-linkedin-video video', 'video'],
-  articleCard: ['.update-components-article', '.feed-shared-article'],
-
-  reactionCount: [
-    '[data-testid="social-actions-reactions"]',
-    '.social-details-social-counts__reactions-count',
-    'button[aria-label*="reaction"]',
-  ],
-  commentCount: [
-    '[data-testid="social-actions-comments"]',
-    '.social-details-social-counts__comments button',
-    'button[aria-label*="comment"]',
-  ],
-  repostCount: ['.social-details-social-counts__item--right-aligned button'],
-
-  // Action controls. We click these; we never call LinkedIn's API ourselves.
+  // The reaction state is in the label text, not aria-pressed. See `isLiked`.
   likeButton: [
-    'button[data-testid="like-button"]',
+    'button[aria-label^="Reaction button state"]',
     'button.react-button__trigger',
     'button[aria-label^="React Like"]',
-    'button[aria-label*="Like"]',
   ],
-  commentButton: [
-    'button[data-testid="comment-button"]',
-    'button.comment-button',
-    'button[aria-label*="Comment"]',
-  ],
-  repostButton: [
-    'button[data-testid="reshare-button"]',
-    'button.social-reshare-button',
-    'button[aria-label*="Repost"]',
-    'button[aria-label*="Share"]',
-  ],
-  saveMenuButton: [
-    'button[data-testid="control-menu"]',
-    'button.feed-shared-control-menu__trigger',
-    'button[aria-label*="control menu"]',
-  ],
+  reactionsMenu: ['button[aria-label^="Open reactions menu"]'],
 
-  commentEditor: ['div.ql-editor[contenteditable="true"]', 'div[role="textbox"][contenteditable="true"]'],
-  commentSubmit: ['button.comments-comment-box__submit-button--cr', 'button.comments-comment-box__submit-button'],
+  commentEditor: ['div[role="textbox"][contenteditable="true"]', 'div.ql-editor[contenteditable="true"]'],
+  commentSubmit: [
+    'button.comments-comment-box__submit-button--cr',
+    'button.comments-comment-box__submit-button',
+  ],
   commentItem: ['article.comments-comment-entity', 'article.comments-comment-item'],
   commentAuthor: ['.comments-comment-meta__description-title', '.comments-post-meta__name-text'],
   commentBody: ['.comments-comment-item__main-content', '.update-components-text'],
 
-  // Noise markers. See filter/classify.ts for how these are used.
-  promotedLabel: ['.update-components-actor__description'],
-  socialProofHeader: ['.update-components-header', '.feed-shared-header'],
+  authorNameLegacy: ['.update-components-actor__title span[aria-hidden="true"]', '.update-components-actor__title'],
+  authorHeadlineLegacy: [
+    '.update-components-actor__description span[aria-hidden="true"]',
+    '.update-components-actor__description',
+  ],
+  timestampLegacy: [
+    '.update-components-actor__sub-description span[aria-hidden="true"]',
+    '.update-components-actor__sub-description',
+  ],
+  reactionCountLegacy: ['.social-details-social-counts__reactions-count'],
+  commentCountLegacy: ['.social-details-social-counts__comments button'],
   sponsoredBadge: ['[data-testid="sponsored-label"]', '.update-components-actor__sponsored-label'],
+  socialProofHeader: ['.update-components-header', '.feed-shared-header'],
 } as const
 
 /** Which selector variant actually matched, per key. Powers `doctor()`. */
@@ -194,29 +195,52 @@ export function textOf(root: ParentNode, key: SelectorKey): string {
 
 /**
  * LinkedIn renders the same string twice for screen readers: once visible and
- * once in a `.visually-hidden` sibling. Naive textContent yields "Ada LovelaceAda Lovelace".
+ * once hidden. Naive textContent yields "Ada LovelaceAda Lovelace".
  */
 export function visibleTextOf(root: ParentNode, key: SelectorKey): string {
   const el = queryOne(root, key)
-  if (!el) return ''
-  const aria = el.querySelector('[aria-hidden="true"]')
-  const source = aria ?? el
-  const clone = source.cloneNode(true) as Element
+  return el ? cleanText(el) : ''
+}
+
+export function cleanText(el: Element): string {
+  const aria = el.querySelector(':scope > [aria-hidden="true"]')
+  const clone = (aria ?? el).cloneNode(true) as Element
   clone.querySelectorAll('.visually-hidden, [class*="visually-hidden"]').forEach((n) => n.remove())
   return normalizeWhitespace(clone.textContent ?? '')
 }
 
 export function normalizeWhitespace(s: string): string {
-  return s.replace(/ /g, ' ').replace(/\s+/g, ' ').trim()
+  return s.replace(/ /g, ' ').replace(/\s+/g, ' ').trim()
 }
 
 /**
- * The stable identity of a post. LinkedIn has kept `urn:li:activity:<id>` across
- * every redesign of the last several years, in `data-urn` or `data-id`.
+ * A post's stable identity.
+ *
+ * Server-driven markup puts a token in componentkey:
+ *   "expanded<TOKEN>FeedType_MAIN_FEED_RELEVANCE"
+ * Legacy markup has the activity urn. Either way the value is stable for as
+ * long as the post is in the DOM, which is all the store needs to merge
+ * re-harvests and to find the post again when an action fires.
  */
-export function postUrn(el: Element): string | null {
-  const direct = el.getAttribute('data-urn') ?? el.getAttribute('data-id')
-  if (direct?.includes('urn:li:')) return direct
+export function postId(el: Element): string | null {
+  const urn = el.getAttribute('data-urn') ?? el.getAttribute('data-id')
+  if (urn?.includes('urn:li:')) return urn
+
+  const key = el.getAttribute('componentkey')
+  if (key?.startsWith('expanded')) {
+    return key.replace(/^expanded/, '').replace(/FeedType_.*$/, '') || key
+  }
+
   const nested = el.querySelector('[data-urn^="urn:li:"], [data-id^="urn:li:"]')
   return nested?.getAttribute('data-urn') ?? nested?.getAttribute('data-id') ?? null
+}
+
+/**
+ * The new markup has no activity urn, so a permalink cannot be built. Legacy
+ * posts still can. Callers must handle null.
+ */
+export function permalinkFrom(id: string): string | null {
+  if (!id.includes('urn:li:')) return null
+  const activity = id.split(':').pop() ?? ''
+  return `https://www.linkedin.com/feed/update/urn:li:activity:${activity}/`
 }

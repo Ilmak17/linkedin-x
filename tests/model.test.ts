@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { parseCount, firstTimeToken } from '../src/host/dom-host'
-import { formatCount, initialsOf, permalinkFor } from '../src/model/post'
+import { formatCount, initialsOf } from '../src/model/post'
+import { permalinkFrom } from '../src/host/selectors'
 
 describe('parseCount', () => {
   it.each([
@@ -53,10 +54,14 @@ describe('initialsOf', () => {
   })
 })
 
-describe('permalinkFor', () => {
-  it('builds a feed update URL from the activity urn', () => {
-    expect(permalinkFor('urn:li:activity:7123')).toBe(
+describe('permalinkFrom', () => {
+  it('builds a feed update URL from a legacy activity urn', () => {
+    expect(permalinkFrom('urn:li:activity:7123')).toBe(
       'https://www.linkedin.com/feed/update/urn:li:activity:7123/',
     )
+  })
+
+  it('returns null for a server-driven componentkey token, which encodes no activity id', () => {
+    expect(permalinkFrom('vYsP5XCgoiWwJX_PzgmqWospNGAL20BAh')).toBeNull()
   })
 })

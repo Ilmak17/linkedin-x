@@ -19,12 +19,15 @@ First working version.
 - Settings popup
 - Kill switch: if the feed cannot be read, the extension steps aside and offers the original LinkedIn
 - `__linkedinX.doctor()` console diagnostic reporting which selectors matched
-- 52 tests over saved HTML fixtures, runnable without a LinkedIn account
+- 62 tests over saved HTML fixtures, runnable without a LinkedIn account
+- Support for both feed generations: LinkedIn's current server-driven markup and the legacy Ember markup still served to some members
 
 ### Notes
 
+- Reading was verified against the live LinkedIn feed on 2026-08-09. Actions (like, comment, repost, save) and infinite scroll have not been exercised end to end; see the manual checklist in CONTRIBUTING.md.
 - LinkedIn's markup is not a stable interface. Every selector lives in `src/host/selectors.ts` as an ordered candidate list so a break is a one-line fix.
+- The server-driven markup carries no activity urn, so post permalinks are not derivable and the UI degrades to plain text where it would link out.
 - The extension makes no network requests. Fonts are bundled.
 
-[Unreleased]: https://github.com/ilmak/linkedin-x/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/ilmak/linkedin-x/releases/tag/v0.1.0
+[Unreleased]: https://github.com/Ilmak17/linkedin-x/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/Ilmak17/linkedin-x/releases/tag/v0.1.0

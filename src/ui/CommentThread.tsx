@@ -12,13 +12,13 @@ export function CommentThread({ post }: { post: Post }) {
 
   useEffect(() => {
     let live = true
-    void loadComments(post.urn).then((c) => {
+    void loadComments(post.id).then((c) => {
       if (live) setComments(c)
     })
     return () => {
       live = false
     }
-  }, [post.urn])
+  }, [post.id])
 
   const send = async () => {
     const text = draft.trim()
@@ -28,7 +28,7 @@ export function CommentThread({ post }: { post: Post }) {
     setSending(false)
     if (sentOk) {
       setDraft('')
-      setComments(await loadComments(post.urn))
+      setComments(await loadComments(post.id))
     }
   }
 

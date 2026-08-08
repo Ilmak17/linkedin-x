@@ -38,19 +38,19 @@ export function attachHost(h: HostFeed): void {
 
 export function ingest(raws: Parameters<typeof normalize>[0][]): void {
   const incoming = raws.map(normalize)
-  const byUrn = new Map(allPosts.value.map((p) => [p.urn, p]))
+  const byId = new Map(allPosts.value.map((p) => [p.id, p]))
 
   for (const post of incoming) {
-    const existing = byUrn.get(post.urn)
+    const existing = byId.get(post.id)
     // Keep our optimistic viewer state: a re-harvest mid-flight would
     // otherwise flip a like back the moment the user pressed it.
-    byUrn.set(post.urn, existing ? { ...post, viewer: existing.viewer } : post)
+    byId.set(post.id, existing ? { ...post, viewer: existing.viewer } : post)
   }
 
   // Preserve LinkedIn's ordering, which is the ordering it just rendered.
-  const order = new Map(incoming.map((p, i) => [p.urn, i]))
-  allPosts.value = [...byUrn.values()].sort(
-    (a, b) => (order.get(a.urn) ?? Number.MAX_SAFE_INTEGER) - (order.get(b.urn) ?? Number.MAX_SAFE_INTEGER),
+  const order = new Map(incoming.map((p, i) => [p.id, i]))
+  allPosts.value = [...byId.values()].sort(
+    (a, b) => (order.get(a.id) ?? Number.MAX_SAFE_INTEGER) - (order.get(b.id) ?? Number.MAX_SAFE_INTEGER),
   )
 
   if (allPosts.value.length > 0) brokenReason.value = null
@@ -60,8 +60,8 @@ export function markBroken(reason: string): void {
   brokenReason.value = reason
 }
 
-function patch(urn: string, fn: (p: Post) => Post): void {
-  allPosts.value = allPosts.value.map((p) => (p.urn === urn ? fn(p) : p))
+function patch(id: string, fn: (p: Post) => Post): void {
+  allPosts.value = allPosts.value.map((p) => (p.id === id ? fn(p) : p))
 }
 
 export function toast(text: string): void {
@@ -77,16 +77,16 @@ export function toast(text: string): void {
  * host cannot confirm, the change is rolled back and the user is told why.
  */
 async function optimistic(
-  urn: string,
+  id: string,
   apply: (p: Post) => Post,
   revert: (p: Post) => Post,
   action: PostAction,
   failureText: string,
 ): Promise<void> {
-  patch(urn, apply)
-  const result = await host.act(urn, action)
+  patch(id, apply)
+  const result = await host.act(id, action)
   if (!result.ok) {
-    patch(urn, revert)
+    patch(id, revert)
     toast(`${failureText} (${result.error.code})`)
   }
 }
@@ -95,7 +95,7 @@ export function toggleLike(post: Post): void {
   const next = !post.viewer.liked
   const delta = next ? 1 : -1
   void optimistic(
-    post.urn,
+    post.id,
     (p) => ({
       ...p,
       viewer: { ...p.viewer, liked: next },
@@ -114,7 +114,7 @@ export function toggleLike(post: Post): void {
 export function toggleSave(post: Post): void {
   const next = !post.viewer.saved
   void optimistic(
-    post.urn,
+    post.id,
     (p) => ({ ...p, viewer: { ...p.viewer, saved: next } }),
     (p) => ({ ...p, viewer: { ...p.viewer, saved: !next } }),
     { kind: 'save', on: next },
@@ -123,9 +123,9 @@ export function toggleSave(post: Post): void {
 }
 
 export async function repost(post: Post): Promise<void> {
-  const result = await host.act(post.urn, { kind: 'repost' })
+  const result = await host.act(post.id, { kind: 'repost' })
   if (result.ok) {
-    patch(post.urn, (p) => ({ ...p, stats: { ...p.stats, reposts: p.stats.reposts + 1 } }))
+    patch(post.id, (p) => ({ ...p, stats: { ...p.stats, reposts: p.stats.reposts + 1 } }))
     toast('Reposted')
   } else {
     toast(`Could not repost (${result.error.code})`)
@@ -133,17 +133,17 @@ export async function repost(post: Post): Promise<void> {
 }
 
 export async function submitComment(post: Post, text: string): Promise<boolean> {
-  const result = await host.act(post.urn, { kind: 'comment', text })
+  const result = await host.act(post.id, { kind: 'comment', text })
   if (result.ok) {
-    patch(post.urn, (p) => ({ ...p, stats: { ...p.stats, comments: p.stats.comments + 1 } }))
+    patch(post.id, (p) => ({ ...p, stats: { ...p.stats, comments: p.stats.comments + 1 } }))
     return true
   }
   toast(`Could not post the comment (${result.error.code})`)
   return false
 }
 
-export async function loadComments(urn: string) {
-  const result = await host.comments(urn)
+export async function loadComments(id: string) {
+  const result = await host.comments(id)
   if (result.ok) return result.value
   toast(`Could not load comments (${result.error.code})`)
   return []
