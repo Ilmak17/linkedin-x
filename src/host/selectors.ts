@@ -49,6 +49,7 @@ export type SelectorKey =
   | 'document'
   | 'likeButton'
   | 'reactionsMenu'
+  | 'commentBox'
   | 'commentEditor'
   | 'commentSubmit'
   | 'commentItem'
@@ -127,12 +128,27 @@ export const SELECTORS: Record<SelectorKey, readonly string[]> = {
   ],
   reactionsMenu: ['button[aria-label^="Open reactions menu"]'],
 
-  commentEditor: ['div[role="textbox"][contenteditable="true"]', 'div.ql-editor[contenteditable="true"]'],
+  // Scope for the submit control. Without it, "the button that says Comment"
+  // matches the post's own action bar instead of the one that sends.
+  commentBox: ['[componentkey^="commentBox-"]', '.comments-comment-box'],
+  // TipTap, not Quill, in the server-driven markup. It accepts execCommand
+  // insertText, which is what `act` relies on.
+  commentEditor: [
+    '[data-testid="ui-core-tiptap-text-editor-wrapper"] [contenteditable="true"]',
+    'div[role="textbox"][contenteditable="true"]',
+    'div.ql-editor[contenteditable="true"]',
+  ],
   commentSubmit: [
     'button.comments-comment-box__submit-button--cr',
     'button.comments-comment-box__submit-button',
   ],
-  commentItem: ['article.comments-comment-entity', 'article.comments-comment-item'],
+  // Carries the comment's own urn, which is a better id than anything else
+  // on the element.
+  commentItem: [
+    '[componentkey^="replaceableComment_urn:li:comment"]',
+    'article.comments-comment-entity',
+    'article.comments-comment-item',
+  ],
   commentAuthor: ['.comments-comment-meta__description-title', '.comments-post-meta__name-text'],
   commentBody: ['.comments-comment-item__main-content', '.update-components-text'],
 

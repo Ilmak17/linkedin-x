@@ -118,7 +118,7 @@ Click the toolbar icon.
 
 ```bash
 npm run dev        # rebuild the content script on change
-npm test           # 62 tests, no browser needed
+npm test           # 68 tests, no browser needed
 npm run typecheck
 ```
 

@@ -24,7 +24,7 @@ First working version.
 - Settings popup
 - Kill switch: if the feed cannot be read, the extension steps aside and offers the original LinkedIn
 - Doctor diagnostic, readable from the console via `document.documentElement.dataset.linkedinXDoctor`, reporting which markup generation and which selectors matched
-- 62 tests over saved HTML fixtures, runnable without a LinkedIn account
+- 68 tests over saved HTML fixtures, runnable without a LinkedIn account
 - Support for both feed generations: LinkedIn's current server-driven markup and the legacy Ember markup still served to some members
 
 ### Notes

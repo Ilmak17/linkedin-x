@@ -29,7 +29,7 @@ Nothing above `src/host/` may import the DOM contract; nothing in `src/filter/` 
 ## Verification
 
 ```bash
-npm test         # 62 tests over fixtures in tests/fixtures/, no browser needed
+npm test         # 68 tests over fixtures in tests/fixtures/, no browser needed
 npm run typecheck
 npm run build
 ```

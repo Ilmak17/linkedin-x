@@ -231,7 +231,15 @@ export class DomHost implements HostFeed {
       editor.dispatchEvent(new InputEvent('input', { bubbles: true, data: text, inputType: 'insertText' }))
     }
 
-    const submit = await waitForElement(() => queryOne(el, 'commentSubmit') as HTMLButtonElement | null, 3000)
+    // The send control only appears once the editor has content, and in the
+    // server-driven markup it is an unlabelled button reading "Comment" —
+    // same word as the post's own action. Scoping to the comment box is what
+    // keeps us from clicking the wrong one and reopening the thread.
+    const box = queryOne(el, 'commentBox') ?? el
+    const submit = await waitForElement(
+      () => (queryOne(box, 'commentSubmit') ?? findClickableByText(box, SUBMIT_WORDS)) as HTMLButtonElement | null,
+      3000,
+    )
     if (!submit) return fail('SELECTOR_MISS', 'comment submit button not found')
 
     const enabled = await waitFor(() => !submit.disabled, 2000)
@@ -278,7 +286,7 @@ export class DomHost implements HostFeed {
 
 // --- reading the server-driven markup -----------------------------------
 
-const DEGREE = /^[•·]?\s*(1st|2nd|3rd|1-я|2-я|3-я|•)\s*$/i
+const DEGREE = /^[•·]?\s*(1st|2nd|3rd|1-я|2-я|3-я|•)\+?\s*$/i
 const TIME = /^\d+\s*(s|m|h|d|w|mo|y|сек|мин|ч|д|нед|мес|г)\b|^\d+\s*(second|minute|hour|day|week|month|year)/i
 
 /**
@@ -380,14 +388,43 @@ function readLegacyPost(el: Element, id: string): RawPost {
 }
 
 function readComment(el: Element): RawComment {
-  const avatar = el.querySelector('img') as HTMLImageElement | null
+  const avatar = queryOne(el, 'authorAvatar') as HTMLImageElement | null
+  const links = queryAll(el, 'authorLink') as HTMLAnchorElement[]
+  const avatarHref = avatar?.closest('a')?.getAttribute('href') ?? ''
+  const named =
+    (avatarHref ? links.find((a) => a.getAttribute('href') === avatarHref && cleanText(a)) : undefined) ??
+    links.find((a) => cleanText(a).length > 0) ??
+    null
+
+  const leaves = leafTexts(el, null)
+  const authorName = named ? (leafTexts(named, null)[0] ?? '') : ''
+  const timeLabel = leaves.find((t) => TIME.test(t)) ?? ''
+
+  // The comment body is the one long piece of prose; everything else in a
+  // comment is a name, a badge, a follower count or a reaction tally.
+  const text =
+    leaves
+      .filter(
+        (t) =>
+          t !== authorName &&
+          t !== timeLabel &&
+          !isCounter(t) &&
+          !ACTION_WORDS.has(t.toLowerCase()) &&
+          t.length > 2,
+      )
+      .sort((a, b) => b.length - a.length)[0] ?? ''
+
   return {
-    id: el.getAttribute('data-id') ?? el.getAttribute('id') ?? Math.random().toString(36).slice(2),
-    authorName: visibleTextOf(el, 'commentAuthor'),
-    authorHeadline: '',
+    id:
+      el.getAttribute('componentkey')?.replace('replaceableComment_', '') ??
+      el.getAttribute('data-id') ??
+      el.getAttribute('id') ??
+      `${authorName}:${text.slice(0, 24)}`,
+    authorName,
+    authorHeadline: headlineAfterName(leaves, authorName, timeLabel),
     avatarUrl: avatar?.src ?? '',
-    text: visibleTextOf(el, 'commentBody'),
-    timeLabel: '',
+    text,
+    timeLabel: firstTimeToken(timeLabel),
   }
 }
 
@@ -425,6 +462,7 @@ const COMMENT_COUNT_WORDS = ['comment', 'комментар', 'пікір']
 const REPOST_COUNT_WORDS = ['repost', 'repub', 'репост', 'поделил']
 const COMMENT_WORDS = ['comment', 'комментировать', 'пікір']
 const REPOST_WORDS = ['repost', 'репост', 'поделиться']
+const SUBMIT_WORDS = ['comment', 'reply', 'post', 'отправить', 'ответить']
 const SAVE_WORDS = ['save', 'unsave', 'сохранить', 'сақтау']
 // Chrome strings that appear as leaves in the actor block and must never be
 // mistaken for a headline.

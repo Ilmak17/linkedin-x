@@ -1,0 +1,46 @@
+<!--
+  A comment thread as the server-driven feed emits it, captured 2026-08-09 and
+  rewritten with invented people.
+
+  What matters here: the comment carries its own urn in `componentkey`, the
+  editor is TipTap rather than Quill, and the send control is an unlabelled
+  button reading "Comment" — the same word as the post's own action, which is
+  why it has to be looked up inside the comment box.
+-->
+<div role="listitem" componentkey="expandedTOKEN0000000000000000000000000000009FeedType_MAIN_FEED_RELEVANCE">
+  <button aria-label="Open control menu for post by Ada Example"></button>
+  <p><span data-testid="expandable-text-box">A post with a thread under it.</span></p>
+  <button><span>Comment</span></button>
+
+  <div componentkey="commentsSectionContainerTOKEN">
+    <div componentkey="replaceableComment_urn:li:comment:(urn:li:activity:100,200)">
+      <a href="https://www.linkedin.com/company/example-corp/">
+        <figure><img src="https://media.example.com/c1.jpg" alt="View Example Corp’s profile" /></figure>
+      </a>
+      <a href="https://www.linkedin.com/company/example-corp/"><span>Example Corp</span></a>
+      <div><span>Premium</span></div>
+      <div><span>28,814,457 followers</span></div>
+      <div><span>2d</span></div>
+      <div><span>Great work here. Everyone deserves a seat at the table.</span></div>
+      <div><span>8 reactions</span></div>
+      <button aria-label="Reply"></button>
+    </div>
+
+    <div componentkey="replaceableComment_urn:li:comment:(urn:li:activity:100,201)">
+      <a href="https://www.linkedin.com/in/example-eight/">
+        <figure><img src="https://media.example.com/c2.jpg" alt="View Kai Example’s profile" /></figure>
+      </a>
+      <a href="https://www.linkedin.com/in/example-eight/"><span>Kai Example</span></a>
+      <div><span>1h</span></div>
+      <div><span>Second the point about training beyond software roles.</span></div>
+      <button aria-label="Reply"></button>
+    </div>
+  </div>
+
+  <div componentkey="commentBox-TOKEN">
+    <div data-testid="ui-core-tiptap-text-editor-wrapper">
+      <div role="textbox" contenteditable="true" aria-label="Text editor for creating comment"></div>
+    </div>
+    <button><span>Comment</span></button>
+  </div>
+</div>
