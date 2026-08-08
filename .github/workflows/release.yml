@@ -1,0 +1,38 @@
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+      - run: npm test
+
+      # Release artifacts do include the fonts, so a user who downloads the zip
+      # gets the extension as designed without running a script.
+      - run: npm run fonts
+      - run: npm run build
+
+      - name: Zip
+        run: cd dist && zip -r ../linkedin-x-${{ github.ref_name }}.zip . && cd ..
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: linkedin-x-${{ github.ref_name }}.zip
+          generate_release_notes: true
+          body: |
+            Unzip, open `chrome://extensions`, enable Developer mode, click
+            **Load unpacked**, and select the unzipped folder.

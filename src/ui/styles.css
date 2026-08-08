@@ -1,0 +1,462 @@
+/* Design tokens: see DESIGN.md. Everything here lives inside a shadow root,
+   so LinkedIn's global stylesheet cannot reach in and ours cannot leak out. */
+
+:host {
+  --bg: #0e0e10;
+  --surface: #16161a;
+  --surface-hover: #1c1c21;
+  --hairline: #232329;
+  --text: #ededef;
+  --text-muted: #8b8b94;
+  --text-faint: #5a5a63;
+  --accent: #e8a33d;
+  --accent-dim: #4a3617;
+  --success: #4fb477;
+  --danger: #e2564d;
+
+  --sans: 'General Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --serif: 'Source Serif 4', ui-serif, Georgia, 'Times New Roman', serif;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --col: 600px;
+  --enter: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:host([data-theme='light']) {
+  --bg: #fbfaf8;
+  --surface: #ffffff;
+  --surface-hover: #f3f1ed;
+  --hairline: #e6e3de;
+  --text: #17171a;
+  --text-muted: #6b6b73;
+  --text-faint: #9a9aa2;
+  --accent: #b26e10;
+  --accent-dim: #f7e9cf;
+  --success: #2e7d52;
+  --danger: #c0392b;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* --- top bar ----------------------------------------------------------- */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  height: 52px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.topbar > .inner {
+  width: var(--col);
+  max-width: 100%;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.wordmark {
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  user-select: none;
+}
+.wordmark b {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.topbar .meta {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* --- column ------------------------------------------------------------ */
+
+.column {
+  width: var(--col);
+  max-width: 100%;
+  margin: 0 auto;
+  padding-bottom: 96px;
+}
+
+@media (max-width: 640px) {
+  .topbar > .inner,
+  .column {
+    width: 100%;
+  }
+}
+
+/* --- post -------------------------------------------------------------- */
+
+.post {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.avatar {
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--surface-hover);
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+}
+
+.byline {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.byline .name {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.byline .name:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.byline .headline {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.byline .time {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.text {
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.6;
+  margin-top: 8px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.text.clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: 12;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.more {
+  margin-top: 4px;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.media {
+  margin-top: 12px;
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  overflow: hidden;
+  display: block;
+}
+.media img {
+  width: 100%;
+  display: block;
+}
+
+.linkcard {
+  margin-top: 12px;
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* --- actions ----------------------------------------------------------- */
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  max-width: 320px;
+  margin-top: 12px;
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 0;
+  padding: 4px 0;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-family: var(--sans);
+  transition: color 100ms ease;
+}
+.action:hover {
+  color: var(--text);
+}
+.action:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.action[aria-pressed='true'] {
+  color: var(--accent);
+}
+
+.action svg {
+  width: 17px;
+  height: 17px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  display: block;
+}
+.action[aria-pressed='true'] svg.fillable {
+  fill: currentColor;
+  stroke: currentColor;
+}
+
+/* The one moment of delight in the product. */
+.action.pop svg {
+  animation: pop 220ms var(--enter);
+}
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.action .count {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  min-width: 1ch;
+}
+
+/* --- comments ---------------------------------------------------------- */
+
+.thread {
+  margin-top: 12px;
+  border-top: 1px solid var(--hairline);
+  padding-top: 12px;
+}
+
+.composer {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.composer textarea {
+  flex: 1;
+  resize: none;
+  min-height: 38px;
+  max-height: 200px;
+  padding: 9px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--hairline);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.composer textarea:focus {
+  outline: none;
+  border-color: var(--text-faint);
+}
+
+.btn {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--hairline);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 100ms ease, color 100ms ease;
+  white-space: nowrap;
+}
+.btn:hover:not(:disabled) {
+  border-color: var(--text-faint);
+}
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #17171a;
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.comment {
+  display: flex;
+  gap: 8px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.comment:last-child {
+  border-bottom: 0;
+}
+.comment .avatar {
+  flex-basis: 32px;
+  width: 32px;
+  height: 32px;
+  font-size: 11px;
+}
+.comment .ctext {
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.55;
+  margin-top: 3px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* --- states ------------------------------------------------------------ */
+
+.state {
+  padding: 64px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.state h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+.state .btn {
+  margin-top: 16px;
+}
+
+.footer {
+  padding: 24px 16px 0;
+  text-align: center;
+}
+
+.hidden-note {
+  padding: 16px;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.toasts {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-left: 2px solid var(--danger);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--text);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.28);
+  animation: rise 180ms var(--enter);
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

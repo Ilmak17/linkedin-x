@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>linkedin-x — design system</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#FBFAF8; --surface:#FFFFFF; --surface-hover:#F3F1ED; --hairline:#E6E3DE;
+  --text:#17171A; --text-muted:#6B6B73; --text-faint:#9A9AA2;
+  --accent:#B26E10; --accent-dim:#F7E9CF; --success:#2E7D52; --danger:#C0392B;
+  --sans:'General Sans',system-ui,sans-serif;
+  --serif:'Source Serif 4',Georgia,serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --col:600px;
+}
+[data-theme="dark"] {
+  --bg:#0E0E10; --surface:#16161A; --surface-hover:#1C1C21; --hairline:#232329;
+  --text:#EDEDEF; --text-muted:#8B8B94; --text-faint:#5A5A63;
+  --accent:#E8A33D; --accent-dim:#4A3617; --success:#4FB477; --danger:#E2564D;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);
+     -webkit-font-smoothing:antialiased;padding-bottom:96px}
+.wrap{max-width:900px;margin:0 auto;padding:0 24px}
+header.top{position:sticky;top:0;z-index:10;background:var(--bg);
+  border-bottom:1px solid var(--hairline);height:52px;display:flex;align-items:center}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;width:100%}
+.mark{font-weight:600;font-size:15px;letter-spacing:-.01em}
+.mark b{color:var(--accent)}
+button.ghost{font-family:var(--sans);font-size:13px;color:var(--text-muted);background:none;
+  border:1px solid var(--hairline);border-radius:6px;padding:6px 12px;cursor:pointer;transition:color .1s,border-color .1s}
+button.ghost:hover{color:var(--text);border-color:var(--text-faint)}
+section{padding:48px 0;border-bottom:1px solid var(--hairline)}
+h2{font-size:20px;font-weight:600;letter-spacing:-.01em;margin-bottom:8px}
+.lede{color:var(--text-muted);font-size:13px;max-width:60ch;margin-bottom:32px;line-height:1.5}
+
+/* palette */
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.sw{border:1px solid var(--hairline);border-radius:6px;overflow:hidden}
+.sw .chip{height:64px}
+.sw .meta{padding:8px 10px}
+.sw .name{font-size:12px;font-weight:500}
+.sw .hex{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:2px}
+
+/* type specimen */
+.spec{border-left:2px solid var(--accent);padding-left:20px;margin-bottom:28px}
+.spec .role{font-family:var(--mono);font-size:11px;color:var(--text-faint);
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.t-display{font-size:28px;line-height:1.15;font-weight:600;letter-spacing:-.02em}
+.t-body{font-family:var(--serif);font-size:17px;line-height:1.6;max-width:60ch}
+.t-name{font-size:15px;font-weight:600}
+.t-meta{font-size:13px;color:var(--text-muted)}
+.t-num{font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums;color:var(--text-muted)}
+
+/* feed mock */
+.feed{width:var(--col);max-width:100%;margin:0 auto;border:1px solid var(--hairline);border-radius:10px;overflow:hidden}
+.feed .bar{height:52px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;border-bottom:1px solid var(--hairline)}
+.post{padding:16px;border-bottom:1px solid var(--hairline);display:flex;gap:12px}
+.post:last-child{border-bottom:0}
+.av{width:40px;height:40px;border-radius:999px;flex:0 0 40px;
+  background:linear-gradient(135deg,var(--surface-hover),var(--hairline));
+  display:grid;place-items:center;font-size:13px;font-weight:600;color:var(--text-muted)}
+.body{flex:1;min-width:0}
+.line1{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.line1 .nm{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.line1 .hl{font-size:13px;color:var(--text-muted);min-width:0;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap;flex:1}
+.line1 .ts{font-family:var(--mono);font-size:12px;color:var(--text-faint);font-variant-numeric:tabular-nums}
+.txt{font-family:var(--serif);font-size:17px;line-height:1.6;margin-top:8px;white-space:pre-wrap}
+.img{margin-top:12px;height:220px;border-radius:6px;
+  background:repeating-linear-gradient(45deg,var(--surface),var(--surface) 12px,var(--surface-hover) 12px,var(--surface-hover) 24px);
+  border:1px solid var(--hairline);display:grid;place-items:center;
+  font-family:var(--mono);font-size:11px;color:var(--text-faint)}
+.acts{display:flex;justify-content:space-between;max-width:320px;margin-top:12px}
+.act{display:flex;align-items:center;gap:6px;background:none;border:0;cursor:pointer;
+  color:var(--text-muted);padding:4px 0;transition:color .1s}
+.act:hover{color:var(--text)}
+.act.on{color:var(--accent)}
+.act svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.6;
+  stroke-linecap:round;stroke-linejoin:round}
+.act .n{font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.card{border:1px solid var(--hairline);border-radius:6px;padding:16px}
+.card h3{font-size:13px;font-weight:600;margin-bottom:6px}
+.card p{font-size:13px;color:var(--text-muted);line-height:1.55}
+.risk h3::before{content:"▲ ";color:var(--accent)}
+.safe h3::before{content:"■ ";color:var(--text-faint)}
+.scale{display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap}
+.scale div{background:var(--accent-dim);border:1px solid var(--accent);border-radius:3px;
+  display:grid;place-items:end center;font-family:var(--mono);font-size:10px;color:var(--text-muted);padding-bottom:2px}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <span class="mark">linkedin<b>-x</b></span>
+  <button class="ghost" id="t">toggle theme</button>
+</div></header>
+
+<div class="wrap">
+
+<section>
+  <h2>The one thing</h2>
+  <p class="lede">Someone opens this once and thinks: <em>oh, these are people writing, not brands posting.</em>
+  Every decision below serves that sentence.</p>
+  <div class="grid2">
+    <div class="card safe"><h3>Safe: single 600px column, avatar left, actions bottom</h3>
+      <p>The correct structure for a timeline. Borrowed from x.com because it works, not because it's fashionable.</p></div>
+    <div class="card risk"><h3>Risk: post body set in a serif</h3>
+      <p>Reframes a LinkedIn post from ad copy into writing. Costs some app-ness; all chrome stays in the sans to compensate.</p></div>
+    <div class="card risk"><h3>Risk: amber accent, no blue anywhere</h3>
+      <p>LinkedIn is blue. X is blue. Amber reads as a reading lamp and makes the product recognizable in one glance.</p></div>
+    <div class="card risk"><h3>Risk: hairlines only, zero cards</h3>
+      <p>Removes the corporate card-stack read entirely. Costs boundary clarity between short posts; padding carries it.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>The feed</h2>
+  <p class="lede">Three posts of differing length, one with media. This is the whole product.</p>
+  <div class="feed">
+    <div class="bar"><span class="mark">linkedin<b>-x</b></span>
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="color:var(--text-muted)">
+        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6h.09A1.65 1.65 0 0 0 10 3.09V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </div>
+
+    <article class="post">
+      <div class="av">MK</div>
+      <div class="body">
+        <div class="line1"><span class="nm">Marta Kowalski</span><span class="hl">Staff Engineer, Distributed Systems</span><span class="ts">3h</span></div>
+        <div class="txt">We deleted our retry layer last month and p99 latency dropped 40%. Turns out most of our "transient" failures were self-inflicted: three services each retrying three times against a database that was already saturated. The retries were the load.</div>
+        <div class="acts">
+          <button class="act on"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 21s-7.5-4.7-9.6-9A5.4 5.4 0 0 1 12 6.5 5.4 5.4 0 0 1 21.6 12c-2.1 4.3-9.6 9-9.6 9z"/></svg><span class="n">248</span></button>
+          <button class="act"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.9 8.9 0 0 1-4-.9L3 21l1.9-4.9A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4z"/></svg><span class="n">31</span></button>
+          <button class="act"><svg viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg><span class="n">12</span></button>
+          <button class="act"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+        </div>
+      </div>
+    </article>
+
+    <article class="post">
+      <div class="av">TA</div>
+      <div class="body">
+        <div class="line1"><span class="nm">Timur Abenov</span><span class="hl">Founder at Apollo</span><span class="ts">7h</span></div>
+        <div class="txt">Hiring one senior backend engineer in Almaty. Go, Postgres, a lot of payments work. Remote inside CIS is fine.</div>
+        <div class="img">post media</div>
+        <div class="acts">
+          <button class="act"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.7-9.6-9A5.4 5.4 0 0 1 12 6.5 5.4 5.4 0 0 1 21.6 12c-2.1 4.3-9.6 9-9.6 9z"/></svg><span class="n">96</span></button>
+          <button class="act"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.9 8.9 0 0 1-4-.9L3 21l1.9-4.9A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4z"/></svg><span class="n">8</span></button>
+          <button class="act"><svg viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></button>
+          <button class="act"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+        </div>
+      </div>
+    </article>
+
+    <article class="post">
+      <div class="av">RS</div>
+      <div class="body">
+        <div class="line1"><span class="nm">Reiko Sato</span><span class="hl">Design lead</span><span class="ts">1d</span></div>
+        <div class="txt">Reading a feed should feel like reading. That's the whole pitch.</div>
+        <div class="acts">
+          <button class="act"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.7-9.6-9A5.4 5.4 0 0 1 12 6.5 5.4 5.4 0 0 1 21.6 12c-2.1 4.3-9.6 9-9.6 9z"/></svg><span class="n">1.2k</span></button>
+          <button class="act"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.9 8.9 0 0 1-4-.9L3 21l1.9-4.9A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4z"/></svg><span class="n">104</span></button>
+          <button class="act"><svg viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg><span class="n">46</span></button>
+          <button class="act"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section>
+  <h2>Typography</h2>
+  <p class="lede">Three families, three jobs, no overlap. General Sans for chrome, Source Serif 4 for what people wrote, JetBrains Mono for anything that counts.</p>
+  <div class="spec"><div class="role">display · General Sans 600 · 28/1.15</div>
+    <div class="t-display">A feed that respects your attention</div></div>
+  <div class="spec"><div class="role">post body · Source Serif 4 · 17/1.6</div>
+    <div class="t-body">We deleted our retry layer last month and p99 latency dropped 40%. Turns out most of our transient failures were self-inflicted: three services each retrying three times against a database that was already saturated.</div></div>
+  <div class="spec"><div class="role">author name · General Sans 600 · 15/1.3</div>
+    <div class="t-name">Marta Kowalski</div></div>
+  <div class="spec"><div class="role">headline · General Sans 400 · 13/1.3</div>
+    <div class="t-meta">Staff Engineer, Distributed Systems</div></div>
+  <div class="spec"><div class="role">counters · JetBrains Mono · 12 · tabular-nums</div>
+    <div class="t-num">248 · 31 · 12 · 1.2k</div></div>
+</section>
+
+<section>
+  <h2>Color</h2>
+  <p class="lede">Neutrals carry the interface. Exactly one accent, used rarely. Toggle the theme in the header to check both.</p>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:var(--bg)"></div><div class="meta"><div class="name">background</div><div class="hex" data-v="--bg"></div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--surface)"></div><div class="meta"><div class="name">surface</div><div class="hex" data-v="--surface"></div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--hairline)"></div><div class="meta"><div class="name">hairline</div><div class="hex" data-v="--hairline"></div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--text)"></div><div class="meta"><div class="name">text</div><div class="hex" data-v="--text"></div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--text-muted)"></div><div class="meta"><div class="name">text muted</div><div class="hex" data-v="--text-muted"></div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--accent)"></div><div class="meta"><div class="name">accent</div><div class="hex" data-v="--accent"></div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--accent-dim)"></div><div class="meta"><div class="name">accent dim</div><div class="hex" data-v="--accent-dim"></div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--danger)"></div><div class="meta"><div class="name">danger</div><div class="hex" data-v="--danger"></div></div></div>
+  </div>
+</section>
+
+<section style="border-bottom:0">
+  <h2>Spacing</h2>
+  <p class="lede">Base unit 4px. Post padding 16, avatar gutter 12, body-to-actions 12.</p>
+  <div class="scale">
+    <div style="width:2px;height:12px"></div>
+    <div style="width:4px;height:20px"></div>
+    <div style="width:8px;height:32px"></div>
+    <div style="width:12px;height:44px"></div>
+    <div style="width:16px;height:56px"></div>
+    <div style="width:24px;height:72px"></div>
+    <div style="width:32px;height:88px"></div>
+    <div style="width:48px;height:104px"></div>
+  </div>
+</section>
+
+</div>
+
+<script>
+const root = document.documentElement;
+document.getElementById('t').onclick = () => {
+  root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+  paint();
+};
+function paint(){
+  const cs = getComputedStyle(root);
+  document.querySelectorAll('.hex').forEach(el => {
+    el.textContent = cs.getPropertyValue(el.dataset.v).trim().toUpperCase();
+  });
+}
+paint();
+</script>
+</body>
+</html>

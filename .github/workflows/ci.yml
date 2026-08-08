@@ -1,0 +1,53 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['20', '22']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      # No `npm run fonts` here: the build must succeed without them, because
+      # that is what a contributor with no network access gets.
+      - name: Build
+        run: npm run build
+
+      - name: Check the manifest is valid JSON and points at real files
+        run: |
+          node -e '
+            const fs = require("fs");
+            const m = JSON.parse(fs.readFileSync("dist/manifest.json", "utf8"));
+            const files = [
+              ...m.content_scripts.flatMap(c => c.js),
+              m.action.default_popup,
+              ...Object.values(m.icons),
+            ];
+            const missing = files.filter(f => !fs.existsSync("dist/" + f));
+            if (missing.length) {
+              console.error("manifest references missing files:", missing);
+              process.exit(1);
+            }
+            console.log("manifest ok:", files.length, "referenced files present");
+          '

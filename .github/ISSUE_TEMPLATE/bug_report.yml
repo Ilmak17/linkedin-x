@@ -1,0 +1,56 @@
+name: Bug report
+description: Something is wrong that is not a LinkedIn markup change
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        If the feed is empty or a field is missing, use the
+        **Selector break** template instead. It asks for the one thing that
+        makes those fixable.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected instead
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open linkedin.com/feed
+        2. …
+    validations:
+      required: true
+
+  - type: textarea
+    id: console
+    attributes:
+      label: Console errors
+      description: Anything red in the console on the LinkedIn tab.
+      render: shell
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: e.g. Chrome 131 on macOS 15
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Extension version
+    validations:
+      required: true

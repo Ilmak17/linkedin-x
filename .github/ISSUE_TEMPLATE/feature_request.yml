@@ -1,0 +1,48 @@
+name: Feature request
+description: Suggest something the extension should do
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before writing: the feed is the whole product. A post composer, profile
+        pages, a jobs surface, messaging, analytics, and any network request are
+        all deliberately out of scope. See the Scope section in CONTRIBUTING.md.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is annoying you
+      description: Describe the problem, not the solution. The best features come from a specific irritation.
+    validations:
+      required: true
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: What you have in mind
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part
+      options:
+        - Filtering (what gets hidden)
+        - Reading (layout, typography, media)
+        - Actions (like, comment, repost, save)
+        - Settings
+        - Something else
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This does not require a network request, telemetry, or storing post content
+          required: true
+        - label: This is about the feed, not another part of LinkedIn
+          required: true

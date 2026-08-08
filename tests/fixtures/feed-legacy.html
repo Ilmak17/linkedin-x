@@ -1,0 +1,100 @@
+<!--
+  A trimmed capture of LinkedIn's legacy (Ember) feed markup, containing one
+  organic post, one ad, one "X commented on this" post, and one carousel
+  module with no action bar.
+
+  How to refresh this fixture: open linkedin.com/feed, run
+  `copy(document.querySelector('.scaffold-finite-scroll__content').outerHTML)`
+  in the console, paste here, then delete anything identifying. Fixtures must
+  not contain real names, real URNs, or real profile URLs.
+-->
+<div class="scaffold-finite-scroll__content">
+
+  <!-- 1. organic post -->
+  <div class="feed-shared-update-v2" data-urn="urn:li:activity:1000000000000000001">
+    <div class="update-components-actor">
+      <a class="update-components-actor__meta-link" href="https://www.linkedin.com/in/example-one/">
+        <div class="update-components-actor__avatar">
+          <img src="https://media.example.com/avatar-one.jpg" alt="" />
+        </div>
+        <span class="update-components-actor__title">
+          <span aria-hidden="true">Ada Example</span>
+          <span class="visually-hidden">Ada Example</span>
+        </span>
+        <span class="update-components-actor__description">
+          <span aria-hidden="true">Staff Engineer, Distributed Systems</span>
+          <span class="visually-hidden">Staff Engineer, Distributed Systems</span>
+        </span>
+        <span class="update-components-actor__sub-description">
+          <span aria-hidden="true">3h • Edited • Visible to anyone</span>
+        </span>
+      </a>
+    </div>
+
+    <div class="update-components-text">
+      <span class="break-words">We deleted our retry layer and p99 dropped 40%.
+        <button class="feed-shared-inline-show-more-text__see-more-less-toggle">…see more</button>
+      </span>
+    </div>
+
+    <div class="update-components-image">
+      <img src="https://media.example.com/post-one.jpg" alt="" />
+    </div>
+
+    <div class="social-details-social-counts">
+      <span class="social-details-social-counts__reactions-count">1,248</span>
+      <span class="social-details-social-counts__comments"><button>31 comments</button></span>
+    </div>
+
+    <div class="feed-shared-social-action-bar">
+      <button class="react-button__trigger" aria-label="React Like" aria-pressed="false">Like</button>
+      <button class="comment-button" aria-label="Comment">Comment</button>
+      <button class="social-reshare-button" aria-label="Repost">Repost</button>
+    </div>
+  </div>
+
+  <!-- 2. ad -->
+  <div class="feed-shared-update-v2" data-urn="urn:li:activity:1000000000000000002">
+    <div class="update-components-actor">
+      <a class="update-components-actor__meta-link" href="https://www.linkedin.com/company/example-corp/">
+        <div class="update-components-actor__avatar">
+          <img src="https://media.example.com/avatar-two.jpg" alt="" />
+        </div>
+        <span class="update-components-actor__title"><span aria-hidden="true">Example Corp</span></span>
+        <span class="update-components-actor__description"><span aria-hidden="true">Promoted</span></span>
+      </a>
+    </div>
+    <div class="update-components-text"><span class="break-words">Transform your workflow today.</span></div>
+    <div class="feed-shared-social-action-bar">
+      <button class="react-button__trigger" aria-label="React Like" aria-pressed="false">Like</button>
+    </div>
+  </div>
+
+  <!-- 3. surfaced because a connection commented -->
+  <div class="feed-shared-update-v2" data-urn="urn:li:activity:1000000000000000003">
+    <div class="update-components-header">
+      <span aria-hidden="true">Grace Example commented on this</span>
+    </div>
+    <div class="update-components-actor">
+      <a class="update-components-actor__meta-link" href="https://www.linkedin.com/in/example-three/">
+        <span class="update-components-actor__title"><span aria-hidden="true">Linus Example</span></span>
+        <span class="update-components-actor__description"><span aria-hidden="true">Growth Consultant</span></span>
+        <span class="update-components-actor__sub-description"><span aria-hidden="true">1d</span></span>
+      </a>
+    </div>
+    <div class="update-components-text"><span class="break-words">Ten lessons from my first exit.</span></div>
+    <div class="social-details-social-counts">
+      <span class="social-details-social-counts__reactions-count">2.4K</span>
+    </div>
+    <div class="feed-shared-social-action-bar">
+      <button class="react-button__trigger" aria-label="React Like" aria-pressed="true">Like</button>
+    </div>
+  </div>
+
+  <!-- 4. injected module, no action bar -->
+  <div class="feed-shared-update-v2" data-urn="urn:li:activity:1000000000000000004">
+    <div class="update-components-header"><span aria-hidden="true">People you may know</span></div>
+    <div class="update-components-text"><span class="break-words">Suggested connections</span></div>
+  </div>
+
+</div>

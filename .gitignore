@@ -1,0 +1,14 @@
+node_modules/
+dist/
+*.zip
+
+# Downloaded by `npm run fonts`. Redistributable, but binaries do not belong
+# in the history; release artifacts include them.
+fonts/*.woff2
+
+.DS_Store
+*.log
+.vite/
+coverage/
+.idea/
+.vscode/

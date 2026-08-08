@@ -1,0 +1,77 @@
+name: Selector break (LinkedIn changed its markup)
+description: The feed is empty, missing fields, or showing the "LinkedIn changed something" screen
+labels: [selector-break]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is the most common issue in the project and usually the easiest to fix.
+        The doctor output below is what makes the fix a one-liner, so please include it.
+
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Doctor output
+      description: |
+        On `linkedin.com/feed`, open the browser console and run:
+
+        ```js
+        copy(JSON.stringify(__linkedinX.doctor(), null, 2))
+        ```
+
+        Then paste it here. It contains no post content and no personal data:
+        just selector names, match positions, and your user agent.
+      render: json
+    validations:
+      required: true
+
+  - type: dropdown
+    id: symptom
+    attributes:
+      label: What are you seeing?
+      options:
+        - Empty feed / "LinkedIn changed something" screen
+        - Posts appear but a field is missing (name, text, avatar, time, counts)
+        - Posts appear but the wrong things are filtered
+        - An action does nothing or shows an error toast
+        - Infinite scroll stopped loading more
+    validations:
+      required: true
+
+  - type: input
+    id: field
+    attributes:
+      label: Which field or action, if it is one specific thing?
+      placeholder: e.g. author headline, or the repost button
+
+  - type: input
+    id: locale
+    attributes:
+      label: LinkedIn interface language
+      description: Matters a lot. Several checks are word-based and each locale needs its own entry.
+      placeholder: e.g. English, Русский, Қазақша
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Extension version
+      placeholder: e.g. 0.1.0
+    validations:
+      required: true
+
+  - type: textarea
+    id: markup
+    attributes:
+      label: Markup sample (optional, but it turns this into a merged PR much faster)
+      description: |
+        Run this in the console, then scrub it before pasting:
+
+        ```js
+        copy(document.querySelector('[data-urn^="urn:li:activity"]').outerHTML)
+        ```
+
+        **Remove real names, headlines, profile URLs, image URLs and activity ids first.**
+        See CONTRIBUTING.md for what a clean fixture looks like.
+      render: html
