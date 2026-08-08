@@ -9,83 +9,58 @@
 
 ## The One Thing
 
-Someone opens this once and thinks: **"oh, these are people writing, not brands posting."**
+Someone opens LinkedIn and, for a second, thinks they are on x.com.
 
-Every decision below serves that sentence. The serif body text is the loudest expression of it.
+That is a deliberate reversal of this document's first version, which set post
+text in a serif and used an amber accent to be recognisably *not* x. Tried
+against a real feed, it read as a blog rather than a social app, and the
+person it was built for said so twice. x.com's timeline is the shape people
+already know for reading a stream of short posts. We take the shape.
 
 ## Aesthetic Direction
 
-- **Direction:** Quiet industrial-editorial. The structural discipline of a utility (fixed column, hairlines, tabular numbers) with the typographic care of a reading app.
-- **Decoration level:** Minimal. Typography and negative space do all the work. No gradients, no shadows, no cards, no illustration.
-- **Mood:** A well-set reading app that happens to contain a social feed. Dense enough to scan, quiet enough to actually read.
-- **What we are deliberately not:** LinkedIn's card-and-shadow corporate stack, and x.com's blue. We take x.com's *structure* (single column, avatar-left, hairline separators, bottom action row) because it is the correct structure for a timeline, and we reject its palette and its cramped typography.
+- **Direction:** x.com's dark shell, LinkedIn's content.
+- **Layout:** three columns, `275px` navigation rail, `600px` timeline,
+  `350px` right rail, centred. The timeline is bordered on both sides.
+- **Theme:** dark only. A light theme was built and then removed; nobody using
+  this at 1am wanted it, and every extra theme is a second set of contrast
+  decisions to get wrong.
+- **Decoration:** none. Flat black, hairline borders, one accent.
 
 ## Typography
 
-The type system is where this product earns its identity. Three families, three jobs, no overlap.
+One family, used everywhere, the way x does it. The serif experiment is over:
+in a stream of short professional posts it added weight without adding
+clarity, and it made a social feed read like an essay collection.
 
-- **UI / author names / nav:** **General Sans** (Fontshare) — geometric-humanist grotesque, crisp at small sizes, has real weight range. Not Inter, not Space Grotesk, not the convergence trap.
-- **Post body:** **Source Serif 4** (variable, Google Fonts) — the signature move. A serif reframes a LinkedIn post from ad copy into writing. Excellent screen serif with a genuine variable optical range, unlike display serifs that fall apart below 20px.
-- **Metadata / counters / timestamps:** **JetBrains Mono** at 12px with `font-variant-numeric: tabular-nums`. Counters that don't reflow when a like lands is the small thing that makes optimistic UI feel solid.
-- **Code inside posts:** JetBrains Mono, same family, 13px.
-
-Loading: self-hosted WOFF2 subsets bundled with the extension. No CDN. An extension that phones out to Google Fonts on every LinkedIn page load is both a privacy leak and a Chrome Web Store review problem.
-
-### Scale
-
-| Token | Size / line-height | Family | Use |
-|---|---|---|---|
-| `--fs-body` | 17px / 1.6 | Source Serif 4 | Post body text |
-| `--fs-body-sm` | 15px / 1.55 | Source Serif 4 | Comment body |
-| `--fs-name` | 15px / 1.3 | General Sans 600 | Author name |
-| `--fs-meta` | 13px / 1.3 | General Sans 400 | Headline, "· 3h" |
-| `--fs-num` | 12px / 1 | JetBrains Mono 400 | Counters, timestamps |
-| `--fs-title` | 20px / 1.25 | General Sans 600 | Settings, empty states |
-| `--fs-display` | 28px / 1.15 | General Sans 600 | Onboarding only |
-
-17px body is deliberately larger than LinkedIn's 14px. Fewer posts per screen is a feature.
+- **Everything:** **General Sans**, bundled. Falls back to the system sans.
+- **Post body:** 15px / 20px line height. Same as x, and it is right: at 17px
+  with generous leading, three posts filled a screen and the feed stopped
+  feeling like a feed.
+- **Names:** 15px, 600 weight. **Headline and age:** 15px, muted, on the same
+  line, ellipsised.
+- **Counters:** `font-variant-numeric: tabular-nums`, so a like landing does
+  not shift the row.
 
 ## Color
 
-**Approach:** Restrained. Neutrals carry the interface; exactly one accent, used rarely.
-
-**Risk taken:** the accent is amber, not blue. LinkedIn is blue. X is blue. Every professional tool is blue. Warm amber reads as a reading lamp rather than a notification badge, pairs with the serif, and makes the product recognizable in one glance.
-
-### Dark (default)
+**Approach:** Near-black surface, one blue accent, two semantic colours for
+the two actions that deserve them.
 
 ```css
---bg:            #0E0E10;  /* near-black, slightly cool */
---surface:       #16161A;  /* composer, menus, hover */
---surface-hover: #1C1C21;
---hairline:      #232329;  /* the only separator in the product */
---text:          #EDEDEF;
---text-muted:    #8B8B94;
---text-faint:    #5A5A63;
---accent:        #E8A33D;
---accent-dim:    #4A3617;  /* liked-state fill */
---success:       #4FB477;
---danger:        #E2564D;
+--bg:            #000000;  /* true black, like x's "Lights out" */
+--elevated:      #16181c;  /* right-rail cards, avatars */
+--border:        #2f3336;  /* every divider in the product */
+--text:          #e7e9ea;
+--muted:         #71767b;
+--accent:        #1d9bf0;  /* links, focus, active tab, primary button */
+--like:          #f91880;
+--repost:        #00ba7c;
+--danger:        #f4212e;
 ```
 
-### Light
-
-```css
---bg:            #FBFAF8;  /* warm paper, not white */
---surface:       #FFFFFF;
---surface-hover: #F3F1ED;
---hairline:      #E6E3DE;
---text:          #17171A;
---text-muted:    #6B6B73;
---text-faint:    #9A9AA2;
---accent:        #B26E10;  /* darkened for AA on paper */
---accent-dim:    #F7E9CF;
---success:       #2E7D52;
---danger:        #C0392B;
-```
-
-Both palettes clear WCAG AA for body text (dark: 14.8:1, light: 15.6:1) and for muted text at 13px+ (dark: 5.1:1, light: 5.4:1). Accent on background clears AA for large text and UI elements, and is never used for body copy.
-
-Dark is the default. The audience is developers, and the surface is for evening reading.
+The amber accent is gone with the serif. Being unmistakably not-LinkedIn
+turned out to matter less than being instantly familiar.
 
 ## Spacing
 
@@ -114,24 +89,15 @@ Dark is the default. The audience is developers, and the surface is for evening 
 - **The one moment:** the like button scales `1 → 1.25 → 1` over 220ms on the enter curve and fills with `--accent`. It fires optimistically, before the proxied click resolves. If the action fails, it reverses over 180ms and a hairline toast explains why.
 - **Respect `prefers-reduced-motion: reduce`:** all of the above collapses to instant state changes.
 
-## Safe choices vs risks
-
-**Safe (category baseline, users expect these):**
-- Single ~600px column, avatar-left, action row at the bottom of each post.
-- Circular avatars.
-- Dark by default for a developer-facing tool.
-
-**Risks (where the product gets its own face):**
-1. **Serif post body.** Reframes a post as writing rather than content marketing. Costs some perceived "app-ness"; some users read serif as blog-like. Mitigated by keeping every piece of chrome in the sans.
-2. **Amber accent, no blue anywhere.** Instantly not-LinkedIn and not-X. Costs the learned affordance that blue means interactive; mitigated by never relying on color alone for affordance (icons carry shape and hover states).
-3. **Zero cards, hairlines only.** Removes the corporate stack read. Costs post-boundary clarity for adjacent short posts; mitigated by generous vertical padding.
-
 ## Decisions Log
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
 | 2026-08-08 | Initial design system | Created by /design-consultation for the linkedin-x extension |
-| 2026-08-08 | Serif body, sans chrome | The single strongest lever for "people writing, not brands posting" |
-| 2026-08-08 | Amber accent instead of blue | Differentiation from both LinkedIn and x.com in one glance |
+| 2026-08-08 | Serif body, sans chrome | Reverted 2026-08-09: read as a blog, not a feed |
+| 2026-08-08 | Amber accent instead of blue | Reverted 2026-08-09: familiarity beat differentiation |
 | 2026-08-08 | Self-hosted fonts, no CDN | Privacy, plus Chrome Web Store review friction with remote resources |
 | 2026-08-08 | No post entrance animation | Animating rows in an infinite scroll reads as jank |
+| 2026-08-09 | x.com's three-column shell, dark only | Two rounds of "the design is bad" against a real feed. x's timeline is the shape people already read streams in |
+| 2026-08-09 | One sans, 15/20 body | The serif made short professional posts feel heavier than they are |
+| 2026-08-09 | Light theme removed | Half the contrast decisions, none of the demand |

@@ -1,8 +1,6 @@
 import { render } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
-import { DEFAULTS, loadSettings, saveSettings, type AppSettings, type Theme } from '../lib/settings'
-
-const THEMES: Theme[] = ['dark', 'light', 'system']
+import { DEFAULTS, loadSettings, saveSettings, type AppSettings } from '../lib/settings'
 
 function Toggle({
   label,
@@ -56,17 +54,6 @@ function Popup() {
           checked={s.enabled}
           onChange={(v) => update({ enabled: v })}
         />
-      </section>
-
-      <section>
-        <h2>Theme</h2>
-        <div class="segmented">
-          {THEMES.map((t) => (
-            <button key={t} aria-pressed={s.theme === t} onClick={() => update({ theme: t })}>
-              {t}
-            </button>
-          ))}
-        </div>
       </section>
 
       <section>

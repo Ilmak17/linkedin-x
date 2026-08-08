@@ -15,40 +15,48 @@ export function ActionBar({ post, threadOpen, onToggleThread }: Props) {
   const like = () => {
     if (!post.viewer.liked) {
       setPopping(true)
-      setTimeout(() => setPopping(false), 240)
+      setTimeout(() => setPopping(false), 320)
     }
     toggleLike(post)
   }
 
   return (
     <div class="actions">
-      <button
-        class={`action${popping ? ' pop' : ''}`}
-        aria-pressed={post.viewer.liked}
-        aria-label={post.viewer.liked ? 'Remove reaction' : 'Like'}
-        onClick={like}
-      >
-        <HeartIcon />
-        <span class="count">{formatCount(post.stats.reactions)}</span>
-      </button>
-
-      <button class="action" aria-pressed={threadOpen} aria-label="Comments" onClick={onToggleThread}>
-        <CommentIcon />
+      <button class="action comment" aria-pressed={threadOpen} aria-label="Comments" onClick={onToggleThread}>
+        <span class="ring">
+          <CommentIcon />
+        </span>
         <span class="count">{formatCount(post.stats.comments)}</span>
       </button>
 
-      <button class="action" aria-label="Repost" onClick={() => void repost(post)}>
-        <RepostIcon />
+      <button class="action repost" aria-label="Repost" onClick={() => void repost(post)}>
+        <span class="ring">
+          <RepostIcon />
+        </span>
         <span class="count">{formatCount(post.stats.reposts)}</span>
       </button>
 
       <button
-        class="action"
+        class={`action like${popping ? ' pop' : ''}`}
+        aria-pressed={post.viewer.liked}
+        aria-label={post.viewer.liked ? 'Remove reaction' : 'Like'}
+        onClick={like}
+      >
+        <span class="ring">
+          <HeartIcon />
+        </span>
+        <span class="count">{formatCount(post.stats.reactions)}</span>
+      </button>
+
+      <button
+        class="action save"
         aria-pressed={post.viewer.saved}
         aria-label={post.viewer.saved ? 'Unsave' : 'Save'}
         onClick={() => toggleSave(post)}
       >
-        <BookmarkIcon />
+        <span class="ring">
+          <BookmarkIcon />
+        </span>
       </button>
     </div>
   )

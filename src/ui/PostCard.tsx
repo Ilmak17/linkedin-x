@@ -23,20 +23,18 @@ export function PostCard({ post }: { post: Post }) {
 
       <div class="body">
         <div class="byline">
-          <div class="line1">
-            <a class="name" href={post.author.url} target="_blank" rel="noreferrer noopener">
-              {post.author.name}
-            </a>
-            {post.timeLabel && <span class="dot">·</span>}
-            {link ? (
-              <a class="time" href={link} target="_blank" rel="noreferrer noopener" title="Open on LinkedIn">
-                {post.timeLabel}
-              </a>
-            ) : (
-              <span class="time">{post.timeLabel}</span>
-            )}
-          </div>
+          <a class="name" href={post.author.url} target="_blank" rel="noreferrer noopener">
+            {post.author.name}
+          </a>
           {post.author.headline && <span class="headline">{post.author.headline}</span>}
+          {post.timeLabel && <span class="sep">·</span>}
+          {link ? (
+            <a class="time" href={link} target="_blank" rel="noreferrer noopener" title="Open on LinkedIn">
+              {post.timeLabel}
+            </a>
+          ) : (
+            <span class="time">{post.timeLabel}</span>
+          )}
         </div>
 
         {post.text && <div class={`text${long && !expanded ? ' clamped' : ''}`}>{post.text}</div>}

@@ -9,7 +9,7 @@ import { DEFAULTS, type AppSettings } from '../lib/settings'
  * nothing about LinkedIn beyond the HostFeed interface it is handed.
  */
 
-export type Toast = { id: number; text: string }
+export type Toast = { id: number; text: string; bad: boolean }
 
 export const settings = signal<AppSettings>(DEFAULTS)
 export const allPosts = signal<Post[]>([])
@@ -66,8 +66,8 @@ function patch(id: string, fn: (p: Post) => Post): void {
   allPosts.value = allPosts.value.map((p) => (p.id === id ? fn(p) : p))
 }
 
-export function toast(text: string): void {
-  const t = { id: ++toastId, text }
+export function toast(text: string, bad = true): void {
+  const t = { id: ++toastId, text, bad }
   toasts.value = [...toasts.value, t]
   setTimeout(() => {
     toasts.value = toasts.value.filter((x) => x.id !== t.id)
@@ -128,7 +128,7 @@ export async function repost(post: Post): Promise<void> {
   const result = await host.act(post.id, { kind: 'repost' })
   if (result.ok) {
     patch(post.id, (p) => ({ ...p, stats: { ...p.stats, reposts: p.stats.reposts + 1 } }))
-    toast('Reposted')
+    toast('Reposted', false)
   } else {
     toast(`Could not repost (${result.error.code})`)
   }
