@@ -65,11 +65,14 @@ export type SelectorKey =
   | 'socialProofHeader'
 
 export const SELECTORS: Record<SelectorKey, readonly string[]> = {
+  // The last entry catches search results, which render the same post markup
+  // as the feed but under no feed container of their own.
   feedRoot: [
     '[data-testid="mainFeed"]',
     '.scaffold-finite-scroll__content',
     'main .core-rail',
     'main[aria-label]',
+    'main',
   ],
 
   // A post in the server-driven feed. The `expanded` prefix on componentkey is

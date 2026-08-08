@@ -1,0 +1,41 @@
+<!--
+  The "grow your network" suggestions, captured 2026-08-09 and rewritten with
+  invented people.
+
+  A person card has no componentkey and no data-testid, and every class is a
+  hash, so the card is found by walking up from LinkedIn's own Connect button
+  to the nearest ancestor that also holds a profile link. Identity is the /in/
+  slug, which is the only stable unique thing on the card.
+-->
+<div>
+  <section>
+    <div>
+      <img src="https://media.example.com/p1.jpg" alt="" />
+      <a href="https://www.linkedin.com/in/example-marketer-04594?trk=grow"><span>Malik Example</span></a>
+      <div><span>Digital Marketing Expert | Social Media Manager | Lead Generation Specialist</span></div>
+      <button>Connect</button>
+    </div>
+  </section>
+
+  <section>
+    <div>
+      <a href="https://www.linkedin.com/in/example-designer/"><span>Reiko Example</span></a>
+      <div><span>Product Designer at Example Labs</span></div>
+      <button>Pending</button>
+    </div>
+  </section>
+
+  <section>
+    <div>
+      <img src="https://media.example.com/p3.jpg" alt="" />
+      <a href="https://www.linkedin.com/in/example-founder/"><span>Kai Example</span></a>
+      <div><span>Founder</span></div>
+      <button>Follow</button>
+    </div>
+  </section>
+
+  <!-- A card with a button but no profile link is not a person. -->
+  <section>
+    <div><button>Connect</button></div>
+  </section>
+</div>
