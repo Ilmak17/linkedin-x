@@ -1,0 +1,40 @@
+<!--
+  A member profile, captured 2026-08-09 and rewritten with an invented person.
+
+  Every section is a card keyed
+  `com.linkedin.sdui.profile.card.ref<memberId><SectionName>` — the suffix is
+  the section name, which is the closest thing to a documented anchor anywhere
+  in LinkedIn's markup. Cards can render twice; the populated copy is the one
+  with content, which is why the reader takes the largest.
+-->
+<div>
+  <img alt="Cover photo" src="https://media.example.com/cover.jpg" />
+
+  <section componentkey="com.linkedin.sdui.profile.card.refMEMBER1Topcard">
+    <h2>Ada Example</h2>
+    <div><span>Ada Example</span></div>
+    <div><span>Verify in 2 minutes</span></div>
+    <div><span>Chair, Example Foundation and Founder, Example Energy</span></div>
+    <div><span>Example Foundation</span></div>
+    <div><span>Seattle, Washington, United States</span></div>
+    <div><span>·</span></div>
+    <div><span>Contact info</span></div>
+    <div><span>https://example.com/ada</span></div>
+    <div><span>40,557,416 followers</span></div>
+    <button>Follow</button>
+    <button>Connect</button>
+  </section>
+
+  <!-- The same card, rendered empty. The reader must not pick this one. -->
+  <section componentkey="com.linkedin.sdui.profile.card.refMEMBER1Topcard"></section>
+
+  <section componentkey="com.linkedin.sdui.profile.card.refMEMBER1About">
+    <h2>About</h2>
+    <div><span>Chair of the Example Foundation. Founder of Example Energy. Voracious reader.</span></div>
+  </section>
+
+  <section componentkey="com.linkedin.sdui.profile.card.refMEMBER1SupportedLocales">
+    <h2>Profile language</h2>
+    <div><span>English</span></div>
+  </section>
+</div>

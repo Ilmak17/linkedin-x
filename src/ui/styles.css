@@ -949,3 +949,95 @@ input[type='checkbox']:checked::after {
   overflow-wrap: anywhere;
   color: var(--text);
 }
+
+/* --- profile ------------------------------------------------------------ */
+
+.profile-cover {
+  aspect-ratio: 3 / 1;
+  background: var(--elevated);
+  overflow: hidden;
+}
+.profile-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.profile-head {
+  position: relative;
+  padding: 0 16px 16px;
+}
+.profile-avatar {
+  position: absolute;
+  top: -42px;
+  left: 16px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--bg);
+}
+.profile-avatar .kit-avatar {
+  width: 84px;
+  height: 84px;
+  font-size: 26px;
+}
+.profile-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 0;
+  min-height: 56px;
+}
+.profile-name {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 26px;
+}
+.profile-headline {
+  font-size: 15px;
+  line-height: 21px;
+  color: var(--text);
+  margin-top: 8px;
+}
+.profile-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.profile-meta a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.profile-meta a:hover {
+  text-decoration: underline;
+}
+.profile-followers {
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.profile-section {
+  padding: 16px;
+  border-top: 1px solid var(--border);
+}
+.profile-section h2 {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 10px;
+}
+.profile-section p {
+  font-size: 15px;
+  line-height: 22px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.profile-section .kit-btn {
+  margin-top: 14px;
+  text-decoration: none;
+}

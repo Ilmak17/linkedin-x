@@ -8,6 +8,8 @@ import { attachHost, ingest, markBroken, settings, warmingUp } from '../state/st
 import { attachJobsHost, ingestJobs, jobsWarmingUp } from '../state/jobs'
 import { JobsPage } from '../ui/JobsPage'
 import { NetworkHost } from '../host/network-host'
+import { ProfileHost } from '../host/profile-host'
+import { attachProfileHost, ingestProfile, ProfilePage, profileWarmingUp } from '../ui/ProfilePage'
 import { attachNetworkHost, ingestPeople, NetworkPage, networkWarmingUp } from '../ui/NetworkPage'
 import { cachedSettings, loadSettings, onSettingsChanged, type AppSettings } from '../lib/settings'
 import { App } from '../ui/App'
@@ -22,15 +24,17 @@ const MOUNT_ID = 'linkedin-x-root'
  * a matcher, a host that reads that page, and a view — nothing in the ones
  * already here has to change.
  */
-type SurfaceName = 'feed' | 'jobs' | 'network'
+type SurfaceName = 'feed' | 'jobs' | 'network' | 'profile'
 
 const SURFACES: Array<{ name: SurfaceName; match: RegExp }> = [
   { name: 'feed', match: /^\/feed\/?$/ },
   { name: 'jobs', match: /^\/jobs\/(search|search-results|collections)/ },
   { name: 'network', match: /^\/mynetwork\// },
-  // Search results render exactly the post markup the feed does, so the feed
-  // surface reads them without a reader of its own.
+  { name: 'profile', match: /^\/in\/[^/]+/ },
+  // Search results and a shared post link both render exactly the post markup
+  // the feed does, so the feed surface reads them without a reader of its own.
   { name: 'feed', match: /^\/search\/results\// },
+  { name: 'feed', match: /^\/feed\/update\// },
 ]
 
 function currentSurface(): SurfaceName | null {
@@ -42,6 +46,7 @@ const WARMUP_TRIES = 40 // 20 seconds
 const host = new DomHost()
 const jobsHost = new JobsHost()
 const networkHost = new NetworkHost()
+const profileHost = new ProfileHost()
 let shadowHost: HTMLElement | null = null
 let unobserve: (() => void) | null = null
 let warmUpTimer: number | null = null
@@ -101,7 +106,15 @@ function mount(surface: SurfaceName): void {
   document.documentElement.style.setProperty('scrollbar-width', 'none')
 
   render(
-    surface === 'jobs' ? <JobsPage /> : surface === 'network' ? <NetworkPage /> : <App />,
+    surface === 'jobs' ? (
+      <JobsPage />
+    ) : surface === 'network' ? (
+      <NetworkPage />
+    ) : surface === 'profile' ? (
+      <ProfilePage />
+    ) : (
+      <App />
+    ),
     container,
   )
 }
@@ -114,6 +127,16 @@ function mount(surface: SurfaceName): void {
 function wire(): void {
   if (wired || !shadowHost) return
   wired = true
+
+  if (mountedSurface === 'profile') {
+    attachProfileHost(profileHost)
+    ingestProfile(profileHost.harvest())
+    unobserve = profileHost.observe(ingestProfile)
+    setTimeout(() => {
+      profileWarmingUp.value = false
+    }, 6000)
+    return
+  }
 
   if (mountedSurface === 'network') {
     attachNetworkHost(networkHost)
