@@ -1041,3 +1041,10 @@ input[type='checkbox']:checked::after {
   margin-top: 14px;
   text-decoration: none;
 }
+
+.profile-avatar--square {
+  border-radius: 12px;
+}
+.profile-avatar--square .kit-avatar {
+  border-radius: 10px;
+}

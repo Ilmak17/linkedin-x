@@ -9,6 +9,8 @@ import { attachJobsHost, ingestJobs, jobsWarmingUp } from '../state/jobs'
 import { JobsPage } from '../ui/JobsPage'
 import { NetworkHost } from '../host/network-host'
 import { ProfileHost } from '../host/profile-host'
+import { CompanyHost } from '../host/company-host'
+import { attachCompanyHost, CompanyPage, ingestCompany } from '../ui/CompanyPage'
 import { attachProfileHost, ingestProfile, ProfilePage, profileWarmingUp } from '../ui/ProfilePage'
 import { attachNetworkHost, ingestPeople, NetworkPage, networkWarmingUp } from '../ui/NetworkPage'
 import { cachedSettings, loadSettings, onSettingsChanged, type AppSettings } from '../lib/settings'
@@ -24,13 +26,14 @@ const MOUNT_ID = 'linkedin-x-root'
  * a matcher, a host that reads that page, and a view — nothing in the ones
  * already here has to change.
  */
-type SurfaceName = 'feed' | 'jobs' | 'network' | 'profile'
+type SurfaceName = 'feed' | 'jobs' | 'network' | 'profile' | 'company'
 
 const SURFACES: Array<{ name: SurfaceName; match: RegExp }> = [
   { name: 'feed', match: /^\/feed\/?$/ },
   { name: 'jobs', match: /^\/jobs\/(search|search-results|collections)/ },
   { name: 'network', match: /^\/mynetwork\// },
   { name: 'profile', match: /^\/in\/[^/]+/ },
+  { name: 'company', match: /^\/company\/[^/]+/ },
   // Search results and a shared post link both render exactly the post markup
   // the feed does, so the feed surface reads them without a reader of its own.
   { name: 'feed', match: /^\/search\/results\// },
@@ -47,6 +50,7 @@ const host = new DomHost()
 const jobsHost = new JobsHost()
 const networkHost = new NetworkHost()
 const profileHost = new ProfileHost()
+const companyHost = new CompanyHost()
 let shadowHost: HTMLElement | null = null
 let unobserve: (() => void) | null = null
 let warmUpTimer: number | null = null
@@ -112,6 +116,8 @@ function mount(surface: SurfaceName): void {
       <NetworkPage />
     ) : surface === 'profile' ? (
       <ProfilePage />
+    ) : surface === 'company' ? (
+      <CompanyPage />
     ) : (
       <App />
     ),
@@ -127,6 +133,24 @@ function mount(surface: SurfaceName): void {
 function wire(): void {
   if (wired || !shadowHost) return
   wired = true
+
+  if (mountedSurface === 'company') {
+    // The header is its own reader; the posts below it are ordinary feed
+    // posts, so the feed reader handles those rather than a second parser.
+    attachCompanyHost(companyHost)
+    ingestCompany(companyHost.harvest())
+    attachHost(host)
+    ingest(host.harvest())
+
+    const stopCompany = companyHost.observe(ingestCompany)
+    const stopPosts = host.observe(ingest)
+    unobserve = () => {
+      stopCompany()
+      stopPosts()
+    }
+    startWarmUp()
+    return
+  }
 
   if (mountedSurface === 'profile') {
     attachProfileHost(profileHost)
