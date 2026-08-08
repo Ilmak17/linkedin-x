@@ -16,7 +16,7 @@ body:
         On `linkedin.com/feed`, open the browser console and run:
 
         ```js
-        copy(JSON.stringify(__linkedinX.doctor(), null, 2))
+        copy(JSON.stringify(JSON.parse(document.documentElement.dataset.linkedinXDoctor), null, 2))
         ```
 
         Then paste it here. It contains no post content and no personal data:

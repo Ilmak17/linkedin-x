@@ -97,7 +97,7 @@ function Popup() {
         <a href="https://github.com/Ilmak17/linkedin-x/issues/new?template=selector-break.yml" target="_blank" rel="noreferrer">
           report it
         </a>{' '}
-        and paste the output of <code>__linkedinX.doctor()</code> from the console.
+        and paste the doctor report from the console. The command is in the README.
       </footer>
     </>
   )

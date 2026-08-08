@@ -36,6 +36,10 @@ npm run build
 
 Actions (like, comment, repost, save) cannot be covered by fixtures. If you change them, say plainly that they were not verified rather than implying they were. The manual checklist is in `CONTRIBUTING.md`.
 
+## Diagnostics
+
+The content script runs in an isolated world, so `window.__linkedinX` is invisible to the DevTools console. The doctor report is mirrored onto `document.documentElement.dataset.linkedinXDoctor`, which both worlds can read. Keep it that way: anything meant for a human to read from the console has to cross the world boundary through the DOM.
+
 ## Hard constraints
 
 - No network requests, ever. Fonts are bundled.

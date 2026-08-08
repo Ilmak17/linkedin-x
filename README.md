@@ -88,8 +88,12 @@ Two things are built for that day:
 2. **The doctor.** Open the console on `linkedin.com/feed` and run:
 
    ```js
-   __linkedinX.doctor()
+   JSON.parse(document.documentElement.dataset.linkedinXDoctor)
    ```
+
+   (A content script runs in an isolated world, so it cannot hang a function
+   off the page's `window` where the console would see it. The report is
+   written to a data attribute instead, which both worlds share.)
 
    It reports which markup generation matched, which selector variant matched for every field, how many list items were skipped as modules, and which fields came back empty. Paste that into a [selector break report](https://github.com/Ilmak17/linkedin-x/issues/new?template=selector-break.yml) and the fix is usually a one-line addition to `src/host/selectors.ts`.
 

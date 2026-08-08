@@ -4,6 +4,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Version
 
 ## [Unreleased]
 
+### Fixed
+
+- The timeline stayed empty on a real feed. The mutation observer was bound to the feed container found at start-up, which LinkedIn replaces while it hydrates, so it never fired again. It now watches `documentElement`, with a warm-up poll alongside it.
+- The doctor was unreachable. A content script runs in an isolated world, so `window.__linkedinX` is invisible to the DevTools console; the report is now mirrored onto a data attribute that both worlds can read.
+
 ## [0.1.0] — 2026-08-09
 
 First working version.
@@ -18,7 +23,7 @@ First working version.
 - Dark and light themes plus a system option, `prefers-reduced-motion` honoured
 - Settings popup
 - Kill switch: if the feed cannot be read, the extension steps aside and offers the original LinkedIn
-- `__linkedinX.doctor()` console diagnostic reporting which selectors matched
+- Doctor diagnostic, readable from the console via `document.documentElement.dataset.linkedinXDoctor`, reporting which markup generation and which selectors matched
 - 62 tests over saved HTML fixtures, runnable without a LinkedIn account
 - Support for both feed generations: LinkedIn's current server-driven markup and the legacy Ember markup still served to some members
 

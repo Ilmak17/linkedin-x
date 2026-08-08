@@ -8,14 +8,33 @@ import { App } from '../ui/App'
 
 const MOUNT_ID = 'linkedin-x-root'
 const FEED_PATH = /^\/feed\/?$/
+const WARMUP_EVERY_MS = 500
+const WARMUP_TRIES = 40 // 20 seconds
 
 const host = new DomHost()
 let shadowHost: HTMLElement | null = null
 let unobserve: (() => void) | null = null
+let warmUpTimer: number | null = null
 
 function resolveTheme(theme: Theme): 'dark' | 'light' {
   if (theme !== 'system') return theme
   return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+}
+
+/**
+ * Publishes the diagnostic where a person can actually reach it.
+ *
+ * A content script runs in an isolated world, so anything it hangs off
+ * `window` is invisible to the DevTools console, which evaluates in the
+ * page's world. Writing the report to a data attribute crosses that boundary,
+ * because the DOM is the one thing both worlds share.
+ */
+function publishDoctor(): void {
+  try {
+    document.documentElement.dataset.linkedinXDoctor = JSON.stringify(host.doctor())
+  } catch {
+    // a report we cannot serialise is not worth breaking the feed over
+  }
 }
 
 function mount(): void {
@@ -42,33 +61,74 @@ function mount(): void {
   render(<App />, container)
 
   attachHost(host)
-  const first = host.harvest()
-  ingest(first)
-
-  if (first.length === 0 && host.isReady()) {
-    markBroken('Found the feed container but read zero posts out of it.')
-  }
+  ingest(host.harvest())
+  publishDoctor()
 
   unobserve = host.observe((posts) => {
-    if (posts.length === 0 && host.isReady()) {
-      markBroken('The feed is present but no post matched our selectors.')
+    ingest(posts)
+    publishDoctor()
+  })
+
+  startWarmUp()
+}
+
+/**
+ * The server-driven feed is usually empty at `document_idle` and fills in over
+ * the next few seconds. The MutationObserver should catch that, but it is the
+ * single point of failure for the whole extension, so this polls alongside it
+ * until posts show up.
+ *
+ * It also decides the difference between "not loaded yet" and "genuinely
+ * broken": if the feed ends up full of list items and we still cannot read a
+ * post out of any of them, that is the kill switch's cue.
+ */
+function startWarmUp(): void {
+  let tries = 0
+  stopWarmUp()
+
+  warmUpTimer = window.setInterval(() => {
+    tries++
+    const posts = host.harvest()
+
+    if (posts.length > 0) {
+      ingest(posts)
+      publishDoctor()
+      stopWarmUp()
       return
     }
-    ingest(posts)
-  })
+
+    if (tries >= WARMUP_TRIES) {
+      stopWarmUp()
+      publishDoctor()
+      const { listItemsInFeed, feedRootFound } = host.doctor()
+      if (listItemsInFeed > 0) {
+        markBroken(`Found ${listItemsInFeed} items in the feed but could not read a post out of any of them.`)
+      } else if (feedRootFound) {
+        markBroken('Found the feed container, but it never rendered anything we recognise as a post.')
+      }
+    }
+  }, WARMUP_EVERY_MS)
+}
+
+function stopWarmUp(): void {
+  if (warmUpTimer !== null) {
+    clearInterval(warmUpTimer)
+    warmUpTimer = null
+  }
 }
 
 function unmount(): void {
+  stopWarmUp()
   unobserve?.()
   unobserve = null
   shadowHost?.remove()
   shadowHost = null
   document.documentElement.style.removeProperty('scrollbar-width')
+  delete document.documentElement.dataset.linkedinXDoctor
 }
 
 function applySettings(next: AppSettings): void {
   settings.value = next
-  shadowHost?.setAttribute('data-theme', resolveTheme(next.theme))
 
   const onFeed = FEED_PATH.test(location.pathname)
   if (next.enabled && onFeed) mount()
@@ -95,10 +155,10 @@ async function boot(): Promise<void> {
     if (settings.value.theme === 'system') applySettings(settings.value)
   })
 
-  // A diagnostic for the "LinkedIn changed its markup" bug report. Users are
-  // asked to paste the output into an issue.
+  // Reachable from the isolated world only; the data attribute above is what
+  // the console sees. Both are kept because they cost nothing.
   Object.defineProperty(window, '__linkedinX', {
-    value: { doctor: () => host.doctor(), harvest: () => host.harvest() },
+    value: { doctor: () => host.doctor(), harvest: () => host.harvest(), publish: publishDoctor },
     configurable: true,
   })
 }

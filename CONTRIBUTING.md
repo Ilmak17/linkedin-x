@@ -8,7 +8,7 @@ The most valuable contributions to this project are small and specific. Read thi
 
 This is the bread and butter of the project and needs no architectural knowledge.
 
-1. On `linkedin.com/feed`, open the console and run `__linkedinX.doctor()`.
+1. On `linkedin.com/feed`, open the console and run `JSON.parse(document.documentElement.dataset.linkedinXDoctor)`.
 2. Find the field that is missing or matching the wrong element.
 3. Add the new selector to the **front** of that key's list in `src/host/selectors.ts`. Do not delete the old ones: people on older LinkedIn buckets still need them.
 4. Add a fixture (below) so it stays fixed.

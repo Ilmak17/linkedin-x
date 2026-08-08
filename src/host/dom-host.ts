@@ -68,7 +68,16 @@ export class DomHost implements HostFeed {
   }
 
   observe(onChange: (posts: RawPost[]) => void): () => void {
-    const root = queryOne(document, 'feedRoot') ?? document.body
+    // Deliberately the document element, not the feed container. LinkedIn
+    // hydrates the feed after document_idle and swaps whole subtrees while it
+    // does, so an observer bound to the container we found at start-up ends
+    // up watching a node that is no longer in the document, and never fires
+    // again. `documentElement` is the one node that is never replaced.
+    //
+    // This does not loop on our own renders: the timeline lives in a shadow
+    // root, and a MutationObserver on the host document does not see inside
+    // shadow trees.
+    const root = document.documentElement
     let queued = false
 
     this.#observer = new MutationObserver(() => {
