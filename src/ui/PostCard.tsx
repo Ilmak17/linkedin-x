@@ -3,7 +3,6 @@ import type { Post } from '../model/post'
 import { openThread } from '../state/store'
 import { ActionBar } from './ActionBar'
 import { Avatar } from './kit'
-import { CommentThread } from './CommentThread'
 import { Row } from './kit'
 import { PlayIcon } from './icons'
 
@@ -84,7 +83,6 @@ export function PostCard({ post, cursored }: { post: Post; cursored?: boolean })
           }}
         />
 
-        {threadOpen && <CommentThread post={post} />}
       </>
     </Row>
   )

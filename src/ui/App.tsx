@@ -8,10 +8,12 @@ import {
   loadingMore,
   retryLoadMore,
   toasts,
+  openThread,
   visiblePosts,
   warmingUp,
 } from '../state/store'
 import { Aside } from './Aside'
+import { ThreadView } from './ThreadView'
 import { cursor, useKeyboard } from './useKeyboard'
 import { Button, EmptyState, Skeleton, Tabs } from './kit'
 import { PostCard } from './PostCard'
@@ -40,6 +42,7 @@ export function App() {
   }, [])
 
   const posts = visiblePosts.value
+  const thread = posts.find((p) => p.id === openThread.value)
 
   return (
     <div class="root" ref={scroller}>
@@ -47,6 +50,10 @@ export function App() {
         <Rail />
 
         <main class="feed">
+          {thread ? (
+            <ThreadView post={thread} />
+          ) : (
+            <>
           <Tabs
             tabs={[
               { label: 'For you', active: true },
@@ -118,6 +125,8 @@ export function App() {
                   </Button>
                 </div>
               )}
+            </>
+          )}
             </>
           )}
         </main>
