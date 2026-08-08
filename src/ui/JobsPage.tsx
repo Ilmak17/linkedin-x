@@ -72,7 +72,14 @@ export function JobsPage() {
                   {job.location && <span class="sep"> · </span>}
                   {job.location}
                 </div>
-                {job.postedLabel && <div class="job-posted">{job.postedLabel}</div>}
+                <div class="job-foot">
+                  {job.postedLabel && <span class="job-posted">{job.postedLabel}</span>}
+                  {job.badges.map((b) => (
+                    <span class={`chip${/promoted|продвиг/i.test(b) ? ' chip--ad' : ''}`} key={b}>
+                      {b}
+                    </span>
+                  ))}
+                </div>
               </div>
 
               <button

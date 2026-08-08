@@ -1,9 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { JobsHost } from '../src/host/jobs-host'
+import { dedupeBadges, JobsHost } from '../src/host/jobs-host'
 
 const fixture = readFileSync(resolve(__dirname, 'fixtures/jobs-sdui.html'), 'utf8')
+const legacy = readFileSync(resolve(__dirname, 'fixtures/jobs-legacy.html'), 'utf8')
 
 describe('job search results', () => {
   let host: JobsHost
@@ -66,5 +67,71 @@ describe('job search results', () => {
     document.body.innerHTML = '<div></div>'
     expect(new JobsHost().isReady()).toBe(false)
     expect(new JobsHost().harvest()).toHaveLength(0)
+  })
+})
+
+describe('the legacy /jobs/collections list', () => {
+  let host: JobsHost
+
+  beforeEach(() => {
+    document.body.innerHTML = legacy
+    host = new JobsHost()
+  })
+
+  it('reads a generation with no componentkey at all', () => {
+    expect(host.isReady()).toBe(true)
+    expect(host.harvest()).toHaveLength(3)
+    expect(host.harvest()[0]!.id).toBe('4441442094')
+  })
+
+  it('keeps badges out of the title, company and location', () => {
+    const [first] = host.harvest()
+    expect(first!.title).toBe('Senior Field Development Specialist')
+    expect(first!.company).toBe('Example Medical')
+    expect(first!.location).toBe('Almaty, Kazakhstan (Remote)')
+    expect(first!.postedLabel).toBe('')
+  })
+
+  it('collects the badges instead of dropping them', () => {
+    const promoted = host.harvest().find((j) => j.id === '4448154059')!
+    expect(promoted.badges).toContain('Promoted')
+    expect(promoted.badges).toContain('Easy Apply')
+    expect(promoted.location).toBe('Kazakhstan (Remote)')
+  })
+
+  it('does not mistake "1 day ago" for a badge, or a badge for the age', () => {
+    const job = host.harvest().find((j) => j.id === '4450059387')!
+    expect(job.postedLabel).toBe('1 day ago')
+    expect(job.badges).toEqual(['Easy Apply'])
+    expect(job.company).toBe('Example Genome')
+  })
+
+  it('takes the canonical job url, not the tracking one', () => {
+    expect(host.harvest()[0]!.url).toContain('/jobs/view/4441442094/')
+  })
+})
+
+describe('occlusion and duplicate badges', () => {
+  it('skips virtualised cards that carry an id but render nothing', () => {
+    // The collections list keeps offscreen <li>s in the DOM as empty shells.
+    document.body.innerHTML = `
+      <ul>
+        <li data-occludable-job-id="1"><a href="/jobs/view/1/"><span>Real Job</span></a><div><span>Example</span></div></li>
+        <li data-occludable-job-id="2"></li>
+        <li data-occludable-job-id="3"></li>
+      </ul>`
+    const jobs = new JobsHost().harvest()
+    expect(jobs).toHaveLength(1)
+    expect(jobs[0]!.title).toBe('Real Job')
+  })
+
+  it('collapses a badge LinkedIn prints twice', () => {
+    expect(dedupeBadges(['168 company alumni work here', '168 Microsoft company alumni work here'])).toEqual([
+      'company alumni work here',
+    ])
+  })
+
+  it('keeps genuinely different badges', () => {
+    expect(dedupeBadges(['Promoted', 'Easy Apply', 'Viewed'])).toEqual(['Promoted', 'Easy Apply', 'Viewed'])
   })
 })

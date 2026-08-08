@@ -955,3 +955,26 @@ input[type='checkbox']:checked::after {
   fill: none;
   stroke-width: 1.7;
 }
+
+.job-foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.job-posted {
+  font-size: 13px;
+  color: var(--muted);
+}
+.chip {
+  font-size: 12px;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+.chip--ad {
+  color: var(--faint);
+  border-style: dashed;
+}

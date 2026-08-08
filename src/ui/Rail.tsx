@@ -24,7 +24,7 @@ const LINKS = [
   { href: 'https://www.linkedin.com/notifications/', label: 'Notifications', Icon: BellIcon },
   { href: 'https://www.linkedin.com/messaging/', label: 'Messages', Icon: MessagesIcon },
   { href: 'https://www.linkedin.com/mynetwork/', label: 'Network', Icon: NetworkIcon },
-  { href: 'https://www.linkedin.com/jobs/', label: 'Jobs', Icon: JobsIcon },
+  { href: 'https://www.linkedin.com/jobs/collections/recommended/', label: 'Jobs', Icon: JobsIcon },
   { href: 'https://www.linkedin.com/my-items/saved-posts/', label: 'Saved', Icon: BookmarkIcon },
   { href: 'https://www.linkedin.com/in/', label: 'Profile', Icon: ProfileIcon },
 ]

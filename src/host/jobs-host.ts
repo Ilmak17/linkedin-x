@@ -19,13 +19,38 @@ export interface RawJob {
   company: string
   location: string
   postedLabel: string
+  badges: string[]
   logoUrl: string | null
   url: string
   dismissed: boolean
 }
 
-const CARD = '[componentkey^="job-card-component-ref-"]'
+/**
+ * Two anchors, because LinkedIn serves two different jobs pages.
+ * `/jobs/search-results` is the server-driven markup and keys off
+ * `componentkey`; `/jobs/collections/*` is still the legacy Ember list and
+ * keys off `data-occludable-job-id`. Both were verified on 2026-08-09.
+ */
+const CARDS = ['[componentkey^="job-card-component-ref-"]', 'li[data-occludable-job-id]']
 const DISMISS = 'button[aria-label^="Dismiss"]'
+
+/**
+ * Chips LinkedIn prints inline with the title, company and location. They
+ * have to be pulled out before the remaining leaves are read positionally,
+ * or "Easy Apply" ends up as somebody's location.
+ */
+const BADGES = [
+  'easy apply',
+  'promoted',
+  'viewed',
+  'applied',
+  'be an early applicant',
+  'actively reviewing applicants',
+  'alumni work here',
+  'response managed off linkedin',
+  'легко откликнуться',
+  'продвигается',
+]
 
 export class JobsHost {
   isReady(): boolean {
@@ -40,7 +65,15 @@ export class JobsHost {
       const id = jobId(card)
       if (!id || seen.has(id)) continue
       seen.add(id)
-      jobs.push(readJob(card, id))
+
+      const job = readJob(card, id)
+      // The collections list is occlusion-virtualised: cards outside the
+      // viewport keep their id but render nothing. Listing those would put a
+      // row of blank entries in the middle of the results; they fill in when
+      // scrolled to, and the observer re-harvests then.
+      if (!job.title) continue
+
+      jobs.push(job)
     }
     return jobs
   }
@@ -78,11 +111,18 @@ export class JobsHost {
   }
 
   #cards(): Element[] {
-    return [...document.querySelectorAll(CARD)]
+    for (const selector of CARDS) {
+      const found = [...document.querySelectorAll(selector)]
+      if (found.length > 0) return found
+    }
+    return []
   }
 }
 
 export function jobId(card: Element): string | null {
+  const occludable = card.getAttribute('data-occludable-job-id')
+  if (occludable) return occludable
+
   const key = card.getAttribute('componentkey') ?? ''
   const id = key.replace('job-card-component-ref-', '')
   return id && id !== key ? id : null
@@ -96,11 +136,14 @@ export function jobId(card: Element): string | null {
 export function readJob(card: Element, id: string): RawJob {
   const leaves = leafTexts(card)
   const logo = card.querySelector('img')
-  const link = card.querySelector('a')
+  const link = (card.querySelector('a[href*="/jobs/view/"]') ?? card.querySelector('a')) as HTMLAnchorElement | null
 
-  const postedIndex = leaves.findIndex((t) => /\bago\b|назад|^\d+\s*(h|d|w|mo)\b/i.test(t))
-  const posted = postedIndex >= 0 ? leaves[postedIndex]! : ''
-  const rest = leaves.filter((_, i) => i !== postedIndex && !/^Posted /i.test(leaves[i] ?? ''))
+  const isBadge = (t: string): boolean => BADGES.some((b) => t.toLowerCase().includes(b))
+  const isPosted = (t: string): boolean => /\bago\b|назад|^\d+\s*(h|d|w|mo)\b/i.test(t)
+
+  const posted = leaves.find((t) => isPosted(t) && !isBadge(t)) ?? ''
+  const badges = leaves.filter(isBadge)
+  const rest = leaves.filter((t) => t !== posted && !isBadge(t) && !/^Posted /i.test(t))
 
   return {
     id,
@@ -108,10 +151,31 @@ export function readJob(card: Element, id: string): RawJob {
     company: rest[1] ?? '',
     location: rest[2] ?? '',
     postedLabel: posted.replace(/^Posted\s+/i, ''),
+    badges: dedupeBadges(badges).slice(0, 3),
     logoUrl: logo?.src ?? null,
     url: link?.href ?? `https://www.linkedin.com/jobs/view/${id}/`,
     dismissed: Boolean(card.querySelector('button[aria-label^="Undo"]')),
   }
+}
+
+/**
+ * "168 company alumni work here" and "168 Microsoft company alumni work here"
+ * are the same badge printed twice, so the count prefix is stripped and the
+ * shorter of any two overlapping variants wins.
+ */
+export function dedupeBadges(badges: string[]): string[] {
+  const cleaned = badges.map((b) => b.replace(/^\d+\s+/, '').trim()).filter(Boolean)
+  const kept: string[] = []
+
+  for (const badge of cleaned) {
+    const overlapping = kept.findIndex((k) => k.includes(badge) || badge.includes(k))
+    if (overlapping === -1) {
+      kept.push(badge)
+    } else if (badge.length < kept[overlapping]!.length) {
+      kept[overlapping] = badge
+    }
+  }
+  return kept
 }
 
 function leafTexts(root: Element): string[] {
