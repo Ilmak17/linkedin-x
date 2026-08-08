@@ -1,0 +1,32 @@
+<!--
+  LinkedIn's job detail pane, captured 2026-08-09 and rewritten.
+
+  The pane is found by its "About the job" heading, which is localised, and
+  the description is the first ancestor of that heading holding real prose.
+  The conditions are chips printed as plain leaves elsewhere in the pane —
+  which is why the description block has to be excluded when collecting them,
+  or a job whose body mentions remote work contributes a chip that is not one.
+-->
+<div data-testid="lazy-column">
+  <div>
+    <span>Example Travel</span>
+    <span>Python Developer</span>
+    <span>Astana, Kazakhstan</span>
+    <span>1 week ago</span>
+    <span>Remote</span>
+    <span>Full-time</span>
+    <a href="https://www.linkedin.com/safety/go/?url=https%3A%2F%2Fexample.com%2Fapply">Apply</a>
+    <button>Save</button>
+  </div>
+
+  <div>
+    <h2>About the job</h2>
+    <div>
+      We are looking for an experienced Python developer to join an ambitious team.
+      You will own services end to end, from the first conversation to production.
+      Remote work is possible for candidates in the region, and the team meets twice a year.
+      Requirements: five years with Python, solid Postgres, and a habit of writing things down.
+      We offer a competitive salary, equipment of your choosing, and a real training budget.
+    </div>
+  </div>
+</div>

@@ -925,3 +925,27 @@ input[type='checkbox']:checked::after {
 .thread-composer textarea::placeholder {
   color: var(--muted);
 }
+
+.job-detail-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 26px;
+}
+.job-detail-actions {
+  display: flex;
+  gap: 10px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+.job-detail-actions a {
+  text-decoration: none;
+}
+.job-description {
+  padding: 18px 16px 40px;
+  font-size: 15px;
+  line-height: 24px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--text);
+}

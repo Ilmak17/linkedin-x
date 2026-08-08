@@ -1,10 +1,12 @@
 import { dismissJob, jobFilter, jobs, jobsWarmingUp, openJob, selectedJob, visibleJobs } from '../state/jobs'
+import { JobDetail } from './JobDetail'
 import { Avatar, Button, Chip, EmptyState, FilterBar, Row, SearchBox, Skeleton, Tabs } from './kit'
 import { Rail } from './Rail'
 
 export function JobsPage() {
   const list = visibleJobs.value
   const total = jobs.value.length
+  const open = jobs.value.find((j) => j.id === selectedJob.value)
 
   return (
     <div class="root">
@@ -12,6 +14,10 @@ export function JobsPage() {
         <Rail current="Jobs" />
 
         <main class="feed">
+          {open ? (
+            <JobDetail job={open} />
+          ) : (
+            <>
           <Tabs
             tabs={[
               { label: 'Search', active: true },
@@ -100,6 +106,8 @@ export function JobsPage() {
               </div>
             </Row>
           ))}
+            </>
+          )}
         </main>
 
         <aside class="aside">

@@ -1,10 +1,12 @@
 import { computed, signal } from '@preact/signals'
-import type { JobsHost, RawJob } from '../host/jobs-host'
+import type { JobsHost, RawJob, RawJobDetail } from '../host/jobs-host'
 
 export const jobs = signal<RawJob[]>([])
 export const jobsWarmingUp = signal(true)
 export const selectedJob = signal<string | null>(null)
 export const jobFilter = signal('all')
+export const jobDetail = signal<RawJobDetail | null>(null)
+export const jobDetailLoading = signal(false)
 
 /**
  * Filtering happens over what we already read, so it costs nothing and
@@ -77,7 +79,27 @@ export function ingestJobs(next: RawJob[]): void {
 
 export function openJob(id: string): void {
   selectedJob.value = id
+  jobDetail.value = null
+  jobDetailLoading.value = true
   host?.open(id)
+
+  // LinkedIn renders the detail into its own pane after the click; poll for it
+  // rather than guessing a delay, and give up rather than spin forever.
+  let tries = 0
+  const timer = setInterval(() => {
+    tries++
+    const detail = host?.detail() ?? null
+    if (detail || tries > 24) {
+      jobDetail.value = detail
+      jobDetailLoading.value = false
+      clearInterval(timer)
+    }
+  }, 250)
+}
+
+export function closeJob(): void {
+  selectedJob.value = null
+  jobDetail.value = null
 }
 
 export function dismissJob(id: string): void {

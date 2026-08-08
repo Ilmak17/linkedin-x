@@ -52,6 +52,35 @@ const BADGES = [
   'продвигается',
 ]
 
+export interface RawJobDetail {
+  description: string
+  /** Remote / Hybrid / On-site, Full-time / Contract, and similar chips. */
+  conditions: string[]
+  applyUrl: string | null
+  applyLabel: string
+}
+
+/**
+ * The heading LinkedIn puts above the job description. Matching it is how the
+ * pane is found; add your locale here if the description comes back empty.
+ */
+const ABOUT_HEADINGS = ['about the job', 'о вакансии', 'über den job', "à propos de l'offre", 'sobre el empleo']
+const APPLY_WORDS = ['easy apply', 'apply', 'откликнуться', 'подать заявку']
+const CONDITION_WORDS = [
+  'remote',
+  'hybrid',
+  'on-site',
+  'onsite',
+  'full-time',
+  'part-time',
+  'contract',
+  'internship',
+  'temporary',
+  'удал',
+  'гибрид',
+  'полная занятость',
+]
+
 export class JobsHost {
   isReady(): boolean {
     return this.#cards().length > 0
@@ -90,6 +119,55 @@ export class JobsHost {
     })
     observer.observe(document.documentElement, { childList: true, subtree: true })
     return () => observer.disconnect()
+  }
+
+  /**
+   * Reads the detail pane for whichever job is selected.
+   *
+   * Title, company and location deliberately are not read here: the card
+   * already gave us those and they are far easier to get right there. This
+   * only takes what the pane adds — the description and the conditions.
+   */
+  detail(): RawJobDetail | null {
+    const heading = [...document.querySelectorAll('h1, h2, h3')].find((h) =>
+      ABOUT_HEADINGS.some((w) => normalizeWhitespace(h.textContent ?? '').toLowerCase().includes(w)),
+    )
+    if (!heading) return null
+
+    // Walk out of the heading until the block also contains the description.
+    let block: Element | null = heading.parentElement
+    let description = ''
+    for (let i = 0; i < 5 && block; i++) {
+      const text = normalizeWhitespace(block.textContent ?? '')
+      if (text.length > 300) {
+        description = stripHeading(text, heading)
+        break
+      }
+      block = block.parentElement
+    }
+    if (!description) return null
+
+    const apply = [...document.querySelectorAll('a, button')].find((el) => {
+      const text = normalizeWhitespace(el.textContent ?? '').toLowerCase()
+      return APPLY_WORDS.some((w) => text === w || text === `${w} now`)
+    })
+
+    // The pane prints its chips as plain leaves alongside everything else. The
+    // description has to be excluded explicitly: a job that says "удалённый
+    // формат работы" in its body would otherwise contribute a fake chip.
+    const pane = apply?.closest('[data-testid="lazy-column"]') ?? block
+    const conditions = pane
+      ? leafTexts(pane, block).filter(
+          (t) => t.length < 30 && CONDITION_WORDS.some((w) => t.toLowerCase().includes(w)),
+        )
+      : []
+
+    return {
+      description,
+      conditions: [...new Set(conditions)].slice(0, 4),
+      applyUrl: apply instanceof HTMLAnchorElement ? apply.href : null,
+      applyLabel: normalizeWhitespace(apply?.textContent ?? '') || 'Apply on LinkedIn',
+    }
   }
 
   /** Opens a job in LinkedIn's own detail pane by clicking its card. */
@@ -163,6 +241,11 @@ export function readJob(card: Element, id: string): RawJob {
  * are the same badge printed twice, so the count prefix is stripped and the
  * shorter of any two overlapping variants wins.
  */
+function stripHeading(text: string, heading: Element): string {
+  const label = normalizeWhitespace(heading.textContent ?? '')
+  return normalizeWhitespace(text.startsWith(label) ? text.slice(label.length) : text)
+}
+
 export function dedupeBadges(badges: string[]): string[] {
   const cleaned = badges.map((b) => b.replace(/^\d+\s+/, '').trim()).filter(Boolean)
   const kept: string[] = []
@@ -178,11 +261,12 @@ export function dedupeBadges(badges: string[]): string[] {
   return kept
 }
 
-function leafTexts(root: Element): string[] {
+function leafTexts(root: Element, exclude?: Element | null): string[] {
   const out: string[] = []
   const seen = new Set<string>()
 
   for (const el of [root, ...root.querySelectorAll('*')]) {
+    if (exclude && (exclude === el || exclude.contains(el))) continue
     const own = [...el.childNodes]
       .filter((n) => n.nodeType === 3)
       .map((n) => n.textContent ?? '')
