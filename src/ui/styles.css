@@ -1048,3 +1048,14 @@ input[type='checkbox']:checked::after {
 .profile-avatar--square .kit-avatar {
   border-radius: 10px;
 }
+
+.notification-text {
+  font-size: 15px;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+}
+.notification-cta {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+}

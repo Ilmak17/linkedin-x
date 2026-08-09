@@ -11,6 +11,13 @@ import { NetworkHost } from '../host/network-host'
 import { ProfileHost } from '../host/profile-host'
 import { CompanyHost } from '../host/company-host'
 import { SavedHost } from '../host/saved-host'
+import { NotificationsHost } from '../host/notifications-host'
+import {
+  attachNotificationsHost,
+  ingestNotifications,
+  NotificationsPage,
+  notificationsWarmingUp,
+} from '../ui/NotificationsPage'
 import { ingestSaved, SavedPage, savedWarmingUp } from '../ui/SavedPage'
 import { attachCompanyHost, CompanyPage, ingestCompany } from '../ui/CompanyPage'
 import { attachProfileHost, ingestProfile, ProfilePage, profileWarmingUp } from '../ui/ProfilePage'
@@ -28,7 +35,7 @@ const MOUNT_ID = 'linkedin-x-root'
  * a matcher, a host that reads that page, and a view — nothing in the ones
  * already here has to change.
  */
-type SurfaceName = 'feed' | 'jobs' | 'network' | 'profile' | 'company' | 'saved'
+type SurfaceName = 'feed' | 'jobs' | 'network' | 'profile' | 'company' | 'saved' | 'notifications'
 
 const SURFACES: Array<{ name: SurfaceName; match: RegExp }> = [
   { name: 'feed', match: /^\/feed\/?$/ },
@@ -37,6 +44,7 @@ const SURFACES: Array<{ name: SurfaceName; match: RegExp }> = [
   { name: 'profile', match: /^\/in\/[^/]+/ },
   { name: 'company', match: /^\/company\/[^/]+/ },
   { name: 'saved', match: /^\/my-items\// },
+  { name: 'notifications', match: /^\/notifications\// },
   // Search results and a shared post link both render exactly the post markup
   // the feed does, so the feed surface reads them without a reader of its own.
   { name: 'feed', match: /^\/search\/results\// },
@@ -55,6 +63,7 @@ const networkHost = new NetworkHost()
 const profileHost = new ProfileHost()
 const companyHost = new CompanyHost()
 const savedHost = new SavedHost()
+const notificationsHost = new NotificationsHost()
 let shadowHost: HTMLElement | null = null
 let unobserve: (() => void) | null = null
 let warmUpTimer: number | null = null
@@ -124,6 +133,8 @@ function mount(surface: SurfaceName): void {
       <CompanyPage />
     ) : surface === 'saved' ? (
       <SavedPage />
+    ) : surface === 'notifications' ? (
+      <NotificationsPage />
     ) : (
       <App />
     ),
@@ -139,6 +150,16 @@ function mount(surface: SurfaceName): void {
 function wire(): void {
   if (wired || !shadowHost) return
   wired = true
+
+  if (mountedSurface === 'notifications') {
+    attachNotificationsHost(notificationsHost)
+    ingestNotifications(notificationsHost.harvest())
+    unobserve = notificationsHost.observe(ingestNotifications)
+    setTimeout(() => {
+      notificationsWarmingUp.value = false
+    }, 5000)
+    return
+  }
 
   if (mountedSurface === 'saved') {
     ingestSaved(savedHost.harvest())

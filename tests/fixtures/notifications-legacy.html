@@ -1,0 +1,35 @@
+<!--
+  The notifications list, captured 2026-08-09 once the test account finally
+  had one, then rewritten.
+
+  Legacy Ember markup but unusually well anchored: every card is an
+  `article.nt-card` with `data-view-name="notification-card-container"` and an
+  index, and unread state is a class modifier rather than something to infer.
+
+  The bolded entity is a child element, so reading the parent's own text nodes
+  leaves a hole where it was — "Play ! Most solve it". The sentence has to be
+  taken whole from the block containing the bold.
+-->
+<div class="nt-card-list">
+  <article class="nt-card nt-card--unread" data-nt-card-index="0" data-view-name="notification-card-container">
+    <span class="visually-hidden">Unread notification.</span>
+    <img src="https://media.example.com/zip.png" alt="" />
+    <a href="https://www.linkedin.com/games/zip/">
+      <p>🏁 Play <strong>Zip</strong>! Most solve it in under 60 seconds. It's fun and fast.</p>
+    </a>
+    <span>4h</span>
+    <button>Solve now</button>
+    <button aria-label="Settings menu"></button>
+    <button aria-label="Change notification preferences">Change notification preferences</button>
+    <button aria-label="Delete notification">Delete notification</button>
+  </article>
+
+  <article class="nt-card" data-nt-card-index="1" data-view-name="notification-card-container">
+    <img src="https://media.example.com/corp.png" alt="" />
+    <a href="https://www.linkedin.com/company/example-corp/">
+      <p><strong>Example Corp</strong> posted: the quarterly update is out.</p>
+    </a>
+    <span>2d</span>
+    <button aria-label="Delete notification">Delete notification</button>
+  </article>
+</div>
