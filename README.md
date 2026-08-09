@@ -37,7 +37,7 @@ linkedin-x takes a third path: keep LinkedIn's feed running as the engine, draw 
 | Company | `/company/*` | Top card and the page's posts, with follow |
 | Saved | `/my-items/*` | Posts you kept, with their permalinks |
 | Notifications | `/notifications/*` | Unread first, dismiss through LinkedIn |
-| Messaging | `/messaging` | The inbox list; threads still open on LinkedIn |
+| Messaging | `/messaging` | The inbox list; an open thread is left to LinkedIn |
 
 - **x's shell.** 275px rail, 600px timeline, 350px rail, dark only.
 - **Noise gone by default.** Ads, "people you may know", carousels and polls. Each switchable in the right rail.
@@ -131,7 +131,7 @@ Click the toolbar icon.
 
 ```bash
 npm run dev        # rebuild the content script on change
-npm test           # 165 tests, no browser needed
+npm test           # 192 tests, no browser needed
 npm run typecheck
 ```
 

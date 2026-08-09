@@ -28,39 +28,14 @@ import { attachProfileHost, ingestProfile, ProfilePage, profileWarmingUp } from 
 import { attachNetworkHost, ingestPeople, NetworkPage, networkWarmingUp } from '../ui/NetworkPage'
 import { cachedSettings, loadSettings, onSettingsChanged, type AppSettings } from '../lib/settings'
 import { App } from '../ui/App'
+import { surfaceFor, type SurfaceName } from './surfaces'
 
 const MOUNT_ID = 'linkedin-x-root'
 
-/**
- * Which LinkedIn page we take over, and with what.
- *
- * Everything not listed here is left to LinkedIn: the rail links out to those
- * pages and the overlay unmounts when you follow one. Adding a surface means
- * a matcher, a host that reads that page, and a view — nothing in the ones
- * already here has to change.
- */
-type SurfaceName = 'feed' | 'jobs' | 'network' | 'profile' | 'company' | 'saved' | 'notifications' | 'messaging'
-
-const SURFACES: Array<{ name: SurfaceName; match: RegExp }> = [
-  { name: 'feed', match: /^\/feed\/?$/ },
-  { name: 'jobs', match: /^\/jobs\/(search|search-results|collections)/ },
-  { name: 'network', match: /^\/mynetwork\// },
-  { name: 'profile', match: /^\/in\/[^/]+/ },
-  { name: 'company', match: /^\/company\/[^/]+/ },
-  { name: 'saved', match: /^\/my-items\// },
-  { name: 'notifications', match: /^\/notifications\// },
-  { name: 'messaging', match: /^\/messaging\/?$/ },
-  // Search results and a shared post link both render exactly the post markup
-  // the feed does, so the feed surface reads them without a reader of its own.
-  { name: 'feed', match: /^\/search\/results\// },
-  { name: 'feed', match: /^\/feed\/update\// },
-]
-
-function currentSurface(): SurfaceName | null {
-  return SURFACES.find((s) => s.match.test(location.pathname))?.name ?? null
-}
 const WARMUP_EVERY_MS = 500
 const WARMUP_TRIES = 40 // 20 seconds
+
+const currentSurface = (): SurfaceName | null => surfaceFor(location.pathname)
 
 const host = new DomHost()
 const jobsHost = new JobsHost()

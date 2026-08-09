@@ -28,6 +28,13 @@ export function MessagingPage() {
             ]}
           />
 
+          <a class="composer-cta" href="https://www.linkedin.com/messaging/thread/new/">
+            <span class="prompt">Write a message</span>
+            <span class="btn primary kit-btn kit-btn--primary kit-btn--sm">
+              <span class="kit-btn__label">Compose</span>
+            </span>
+          </a>
+
           {items.length === 0 && messagingWarmingUp.value && (
             <>
               <Skeleton lines={2} />
@@ -36,8 +43,19 @@ export function MessagingPage() {
           )}
 
           {items.length === 0 && !messagingWarmingUp.value && (
-            <EmptyState title="No conversations">
-              Nothing in the inbox. Reading a thread still happens on LinkedIn — only the list is ours.
+            <EmptyState
+              title="No conversations"
+              action={
+                <a
+                  class="kit-btn kit-btn--primary kit-btn--md"
+                  href="https://www.linkedin.com/messaging/thread/new/"
+                >
+                  <span class="kit-btn__label">Write a message</span>
+                </a>
+              }
+            >
+              Nothing in the inbox yet. Opening a conversation hands you back to LinkedIn — we render the list,
+              not the thread.
             </EmptyState>
           )}
 
@@ -72,8 +90,8 @@ export function MessagingPage() {
               <label>
                 The list is ours, the thread is LinkedIn's
                 <span class="sub">
-                  Reading and replying open the real conversation, because a populated inbox has never been
-                  available to build against
+                  Opening a conversation leaves the overlay on purpose: a thread has never been available to
+                  build against, and covering one with a worse version would help nobody
                 </span>
               </label>
             </div>
