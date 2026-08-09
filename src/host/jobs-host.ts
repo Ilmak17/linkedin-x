@@ -1,4 +1,4 @@
-import { normalizeWhitespace } from './selectors'
+import { leafTexts, normalizeWhitespace } from './text'
 
 /**
  * Reads LinkedIn's job search results.
@@ -261,28 +261,3 @@ export function dedupeBadges(badges: string[]): string[] {
   return kept
 }
 
-function leafTexts(root: Element, exclude?: Element | null): string[] {
-  const out: string[] = []
-  const seen = new Set<string>()
-
-  for (const el of [root, ...root.querySelectorAll('*')]) {
-    if (exclude && (exclude === el || exclude.contains(el))) continue
-    const own = [...el.childNodes]
-      .filter((n) => n.nodeType === 3)
-      .map((n) => n.textContent ?? '')
-      .join(' ')
-    const text = normalizeWhitespace(own)
-    if (!text || seen.has(text)) continue
-
-    // LinkedIn repeats the title for screen readers with a badge appended,
-    // e.g. "Senior Backend Engineer (Verified job)" then "Senior Backend
-    // Engineer". An exact-match check misses that, and the near-duplicate
-    // shifts company and location down a slot each.
-    const previous = out[out.length - 1]
-    if (previous && (previous.startsWith(text) || text.startsWith(previous))) continue
-
-    seen.add(text)
-    out.push(text)
-  }
-  return out
-}

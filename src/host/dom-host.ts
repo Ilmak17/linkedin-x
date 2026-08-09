@@ -1,6 +1,7 @@
 import { fail, ok, type Result } from '../lib/result'
 import { throttle } from '../lib/throttle'
 import type { DoctorReport, HostFeed, PostAction, RawComment, RawPost } from './types'
+import { leafTexts } from './text'
 import {
   cleanText,
   normalizeWhitespace,
@@ -489,30 +490,6 @@ function signatureOfElement(el: Element): string {
 
 const isLegacy = (el: Element): boolean => el.hasAttribute('data-urn') || el.hasAttribute('data-id')
 
-/**
- * Every element's own text, in document order, minus the post body.
- *
- * Deliberately reads each element's direct child text nodes rather than its
- * childless descendants: LinkedIn writes the post age as `9h •` alongside a
- * visibility icon in the same span, so that span has an element child and a
- * "childless elements only" walk would miss the timestamp entirely.
- */
-export function leafTexts(root: Element, exclude: Element | null): string[] {
-  const out: string[] = []
-  const seen = new Set<string>()
-  for (const el of [root, ...root.querySelectorAll('*')]) {
-    if (exclude && (exclude === el || exclude.contains(el))) continue
-    const own = [...el.childNodes]
-      .filter((n) => n.nodeType === 3)
-      .map((n) => n.textContent ?? '')
-      .join(' ')
-    const text = normalizeWhitespace(own)
-    if (!text || seen.has(text)) continue // LinkedIn duplicates strings for screen readers
-    seen.add(text)
-    out.push(text)
-  }
-  return out
-}
 
 // Word lists. LinkedIn serves the UI in the member's locale, so anything
 // matched by text needs an entry per language. Add yours and send a PR.

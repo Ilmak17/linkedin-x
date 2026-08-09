@@ -1,4 +1,4 @@
-import { normalizeWhitespace } from './selectors'
+import { leafTexts } from './text'
 
 /**
  * Reads the messaging inbox.
@@ -119,20 +119,3 @@ export function readConversation(card: Element): RawConversation | null {
   }
 }
 
-function leafTexts(root: Element): string[] {
-  const out: string[] = []
-  const seen = new Set<string>()
-  for (const el of [root, ...root.querySelectorAll('*')]) {
-    const own = [...el.childNodes]
-      .filter((n) => n.nodeType === 3)
-      .map((n) => n.textContent ?? '')
-      .join(' ')
-    const text = normalizeWhitespace(own)
-    if (!text || seen.has(text)) continue
-    const previous = out[out.length - 1]
-    if (previous && (previous.startsWith(text) || text.startsWith(previous))) continue
-    seen.add(text)
-    out.push(text)
-  }
-  return out
-}
