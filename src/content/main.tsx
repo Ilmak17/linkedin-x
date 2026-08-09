@@ -117,14 +117,26 @@ function mount(surface: SurfaceName): void {
   // suppress the scrollbar, not the scrolling.
   document.documentElement.style.setProperty('scrollbar-width', 'none')
 
-  // The rail replaces LinkedIn's nav, so the unread counts have to be lifted
-  // off it — otherwise the only way to notice a new message is to leave.
-  // Watched here rather than per surface: every surface has the rail.
-  badges.value = badgesHost.read()
-  unbadge = badgesHost.observe((next) => {
-    badges.value = next
-  })
+  // A blank overlay is worse than no overlay: it hides a working LinkedIn
+  // behind a black screen with no way back. If the first render throws or
+  // produces nothing, the overlay takes itself off the page.
+  try {
+    renderSurface(surface, container)
+  } catch (error) {
+    console.error('[linkedin-x] first render failed, standing down', error)
+    unmount()
+    return
+  }
 
+  requestAnimationFrame(() => {
+    if (shadowHost && container.childElementCount === 0) {
+      console.error('[linkedin-x] rendered nothing, standing down')
+      unmount()
+    }
+  })
+}
+
+function renderSurface(surface: SurfaceName, container: HTMLElement): void {
   render(
     surface === 'jobs' ? (
       <JobsPage />
@@ -155,6 +167,18 @@ function mount(surface: SurfaceName): void {
 function wire(): void {
   if (wired || !shadowHost) return
   wired = true
+
+  // The rail replaces LinkedIn's nav, so the unread counts have to be lifted
+  // off it — otherwise the only way to notice a new message is to leave.
+  //
+  // Wired here rather than in `mount`, which runs at document_start: there is
+  // no nav and no body to watch that early, and observing null throws — which
+  // it did, silently, before `render` was ever reached, leaving the overlay
+  // mounted and completely blank.
+  badges.value = badgesHost.read()
+  unbadge = badgesHost.observe((next) => {
+    badges.value = next
+  })
 
 
   if (mountedSurface === 'messaging') {

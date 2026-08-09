@@ -61,3 +61,23 @@ describe('which path maps to which screen', () => {
     expect(surfaceFor('/company/example-corp/jobs/')).toBe('company')
   })
 })
+
+describe('the mount path cannot be reached before the document exists', () => {
+  it('badges never observe a null node', async () => {
+    // mount() runs at document_start, where there is no <body> and no <nav>.
+    // Observing null throws, and it threw before render() was reached — which
+    // left the overlay on the page and completely blank.
+    const { BadgesHost } = await import('../src/host/badges-host')
+
+    const body = document.body
+    // Simulate document_start: nothing to find, and no body to fall back to.
+    Object.defineProperty(document, 'body', { value: null, configurable: true })
+    try {
+      const stop = new BadgesHost().observe(() => {})
+      expect(typeof stop).toBe('function')
+      stop()
+    } finally {
+      Object.defineProperty(document, 'body', { value: body, configurable: true })
+    }
+  })
+})

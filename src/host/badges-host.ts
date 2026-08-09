@@ -35,7 +35,12 @@ export class BadgesHost {
     // characterData. The first version watched the whole document for every
     // text change, which on LinkedIn is a firehose, to read four numbers that
     // change a few times an hour.
-    const nav = document.querySelector('nav, [data-testid="primary-nav"], .global-nav') ?? document.body
+    // documentElement, not body: this can be called before body exists, and
+    // observing null throws.
+    const nav =
+      document.querySelector('nav, [data-testid="primary-nav"], .global-nav') ??
+      document.body ??
+      document.documentElement
     const pump = throttle(() => onChange(this.read()), 1000)
 
     const observer = new MutationObserver(pump.call)
