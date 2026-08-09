@@ -102,16 +102,36 @@ export function toggleLike(post: Post): void {
     post.id,
     (p) => ({
       ...p,
-      viewer: { ...p.viewer, liked: next },
+      viewer: { ...p.viewer, liked: next, reaction: next ? p.viewer.reaction || 'Like' : '' },
       stats: { ...p.stats, reactions: Math.max(0, p.stats.reactions + delta) },
     }),
     (p) => ({
       ...p,
-      viewer: { ...p.viewer, liked: !next },
+      viewer: { ...p.viewer, liked: !next, reaction: !next ? 'Like' : '' },
       stats: { ...p.stats, reactions: Math.max(0, p.stats.reactions - delta) },
     }),
     { kind: 'like', on: next },
     next ? 'Could not like this post' : 'Could not remove the reaction',
+  )
+}
+
+/** Leaves one of LinkedIn's six named reactions. */
+export function react(post: Post, reaction: string): void {
+  const had = post.viewer.liked
+  void optimistic(
+    post.id,
+    (p) => ({
+      ...p,
+      viewer: { ...p.viewer, liked: true, reaction },
+      stats: { ...p.stats, reactions: p.stats.reactions + (had ? 0 : 1) },
+    }),
+    (p) => ({
+      ...p,
+      viewer: { ...p.viewer, liked: had, reaction: had ? p.viewer.reaction : '' },
+      stats: { ...p.stats, reactions: Math.max(0, p.stats.reactions - (had ? 0 : 1)) },
+    }),
+    { kind: 'react', reaction },
+    `Could not react with ${reaction}`,
   )
 }
 

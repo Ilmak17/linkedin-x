@@ -17,6 +17,7 @@ const post = (markers: Partial<RawPost['markers']>): RawPost => ({
   comments: 0,
   reposts: 0,
   liked: false,
+  reaction: '',
   markers: { hasSponsoredBadge: false, descriptionText: '', headerText: '', hasActionBar: true, ...markers },
 })
 

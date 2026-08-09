@@ -2,6 +2,7 @@ import { useState } from 'preact/hooks'
 import { formatCount, type Post } from '../model/post'
 import { repost, toggleLike, toggleSave } from '../state/store'
 import { BookmarkIcon, CommentIcon, HeartIcon, RepostIcon } from './icons'
+import { glyphFor, ReactionPicker } from './ReactionPicker'
 
 interface Props {
   post: Post
@@ -11,6 +12,7 @@ interface Props {
 
 export function ActionBar({ post, threadOpen, onToggleThread }: Props) {
   const [popping, setPopping] = useState(false)
+  const [picking, setPicking] = useState(false)
 
   const like = () => {
     if (!post.viewer.liked) {
@@ -36,17 +38,31 @@ export function ActionBar({ post, threadOpen, onToggleThread }: Props) {
         <span class="count">{formatCount(post.stats.reposts)}</span>
       </button>
 
-      <button
-        class={`action like${popping ? ' pop' : ''}`}
-        aria-pressed={post.viewer.liked}
-        aria-label={post.viewer.liked ? 'Remove reaction' : 'Like'}
-        onClick={like}
+      <div
+        class="action-with-picker"
+        onMouseEnter={() => setPicking(true)}
+        onMouseLeave={() => setPicking(false)}
       >
-        <span class="ring">
-          <HeartIcon />
-        </span>
-        <span class="count">{formatCount(post.stats.reactions)}</span>
-      </button>
+        {picking && <ReactionPicker post={post} onPicked={() => setPicking(false)} />}
+        <button
+          class={`action like${popping ? ' pop' : ''}`}
+          aria-pressed={post.viewer.liked}
+          aria-label={post.viewer.liked ? `Reacted ${post.viewer.reaction}` : 'Like'}
+          aria-haspopup="menu"
+          onClick={like}
+        >
+          <span class="ring">
+            {post.viewer.reaction ? (
+              <span class="reaction-glyph" aria-hidden="true">
+                {glyphFor(post.viewer.reaction)}
+              </span>
+            ) : (
+              <HeartIcon />
+            )}
+          </span>
+          <span class="count">{formatCount(post.stats.reactions)}</span>
+        </button>
+      </div>
 
       <button
         class="action save"

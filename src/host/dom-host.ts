@@ -126,6 +126,8 @@ export class DomHost implements HostFeed {
     switch (action.kind) {
       case 'like':
         return this.#like(el, action.on)
+      case 'react':
+        return this.#react(el, action.reaction)
       case 'comment':
         return this.#comment(el, action.text)
       case 'repost':
@@ -206,6 +208,36 @@ export class DomHost implements HostFeed {
 
     const flipped = await waitFor(() => isLiked(button) === on, 4000)
     return flipped ? ok(undefined) : fail('ACTION_TIMEOUT', 'LinkedIn did not confirm the reaction')
+  }
+
+  /**
+   * Leaves a named reaction rather than a plain Like.
+   *
+   * The six options live in a menu LinkedIn opens next to the post, rendered
+   * in a portal outside it, each an unlabelled button whose aria-label is the
+   * reaction's name. So: open the menu, find the name, click it.
+   */
+  async #react(el: Element, reaction: string): Promise<Result<void>> {
+    const opener = queryOne(el, 'reactionsMenu') as HTMLElement | null
+    if (!opener) return fail('NOT_SUPPORTED', 'this post has no reactions menu')
+    opener.click()
+
+    const option = await waitForElement(
+      () =>
+        [...document.querySelectorAll('button, [role="menuitem"]')].find(
+          (b) => (b.getAttribute('aria-label') ?? '').toLowerCase() === reaction.toLowerCase(),
+        ) as HTMLElement | null,
+      3000,
+    )
+    if (!option) {
+      document.body.click()
+      return fail('SELECTOR_MISS', `no "${reaction}" in the reactions menu`)
+    }
+
+    option.click()
+    const button = queryOne(el, 'likeButton')
+    const confirmed = await waitFor(() => Boolean(button && reactionOf(button)), 4000)
+    return confirmed ? ok(undefined) : fail('ACTION_TIMEOUT', 'LinkedIn did not confirm the reaction')
   }
 
   async #comment(el: Element, text: string): Promise<Result<void>> {
@@ -343,6 +375,7 @@ function readSduiPost(el: Element, id: string): RawPost {
     comments: countFrom(leaves, COMMENT_COUNT_WORDS, false),
     reposts: countFrom(leaves, REPOST_COUNT_WORDS, false),
     liked: likeButton ? isLiked(likeButton) : false,
+    reaction: likeButton ? reactionOf(likeButton) : '',
     markers: {
       hasSponsoredBadge: Boolean(queryOne(el, 'sponsoredBadge')),
       // "Promoted" sits as a plain leaf in the actor block, so the first few
@@ -378,6 +411,7 @@ function readLegacyPost(el: Element, id: string): RawPost {
     comments: parseCount(visibleTextOf(el, 'commentCountLegacy')),
     reposts: 0,
     liked: likeButton ? isLiked(likeButton) : false,
+    reaction: likeButton ? reactionOf(likeButton) : '',
     markers: {
       hasSponsoredBadge: Boolean(queryOne(el, 'sponsoredBadge')),
       descriptionText: description,
@@ -576,6 +610,17 @@ export function cleanBodyText(bodyEl: Element): string {
  * "Reaction button state: no reaction" when untouched, the reaction's name
  * when set.
  */
+/**
+ * The reaction's name, read out of the button's own label:
+ * "Reaction button state: Celebrate". Empty when the viewer left none.
+ */
+export function reactionOf(button: Element): string {
+  const label = button.getAttribute('aria-label') ?? ''
+  const match = label.match(/reaction button state:\s*(.+)$/i)
+  const value = normalizeWhitespace(match?.[1] ?? '')
+  return /^(no reaction|none|нет реакции)$/i.test(value) ? '' : value
+}
+
 export function isLiked(button: Element): boolean {
   const label = (button.getAttribute('aria-label') ?? '').toLowerCase()
   if (label.includes('reaction button state')) {

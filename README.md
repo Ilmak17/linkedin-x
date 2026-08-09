@@ -40,7 +40,7 @@ linkedin-x takes a third path: keep LinkedIn's feed running as the engine, draw 
 
 - **x's shell.** 275px rail, 600px timeline, 350px rail, dark only.
 - **Noise gone by default.** Ads, "people you may know", carousels and polls. Each switchable in the right rail.
-- **Actions still work.** Like, comment, repost, save, connect, follow — all by clicking LinkedIn's own controls.
+- **Actions still work.** All six reactions, comment, repost, save, connect, follow — all by clicking LinkedIn's own controls.
 - **Keyboard.** `j` `k` move, `l` like, `s` save, `enter` opens replies, `/` searches.
 - **It gets out of the way when it breaks.** If a surface cannot be read, it says so and hands you the original.
 
@@ -129,7 +129,7 @@ Click the toolbar icon.
 
 ```bash
 npm run dev        # rebuild the content script on change
-npm test           # 146 tests, no browser needed
+npm test           # 147 tests, no browser needed
 npm run typecheck
 ```
 

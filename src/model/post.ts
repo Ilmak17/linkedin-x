@@ -19,7 +19,7 @@ export interface Post {
   hasVideo: boolean
   linkTitle: string | null
   stats: { reactions: number; comments: number; reposts: number }
-  viewer: { liked: boolean; saved: boolean }
+  viewer: { liked: boolean; saved: boolean; reaction: string }
   /**
    * LinkedIn's permalink for the post, when one can be derived. The
    * server-driven markup carries no activity urn, so this is usually null and
@@ -45,7 +45,7 @@ export function normalize(raw: RawPost): Post {
     hasVideo: raw.hasVideo,
     linkTitle: raw.linkTitle,
     stats: { reactions: raw.reactions, comments: raw.comments, reposts: raw.reposts },
-    viewer: { liked: raw.liked, saved: false },
+    viewer: { liked: raw.liked, saved: false, reaction: raw.reaction },
     permalink: permalinkFrom(raw.id),
   }
 }

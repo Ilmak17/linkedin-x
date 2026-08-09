@@ -78,6 +78,14 @@ describe('server-driven markup', () => {
 
   it('reads the reaction state from the button label, not aria-pressed', () => {
     expect(posts[0]!.liked).toBe(false)
+    expect(posts[0]!.reaction).toBe('')
+  })
+
+  it('reads which of the six reactions the viewer left', () => {
+    // The label carries the name: "Reaction button state: Celebrate".
+    const repost = posts[2]!
+    expect(repost.liked).toBe(true)
+    expect(repost.reaction).toBe('Celebrate')
   })
 
   it('tells the avatar apart from the post image', () => {

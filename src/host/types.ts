@@ -28,6 +28,8 @@ export interface RawPost {
   comments: number
   reposts: number
   liked: boolean
+  /** Which reaction the viewer left, empty when none. LinkedIn offers six. */
+  reaction: string
   /** Raw markers the classifier uses; see filter/classify.ts. */
   markers: {
     hasSponsoredBadge: boolean
@@ -48,6 +50,7 @@ export interface RawComment {
 
 export type PostAction =
   | { kind: 'like'; on: boolean }
+  | { kind: 'react'; reaction: string }
   | { kind: 'comment'; text: string }
   | { kind: 'repost' }
   | { kind: 'save'; on: boolean }
