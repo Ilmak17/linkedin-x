@@ -1,3 +1,4 @@
+import { signal } from '@preact/signals'
 import {
   BellIcon,
   BookmarkIcon,
@@ -29,6 +30,9 @@ const LINKS = [
   { href: 'https://www.linkedin.com/in/', label: 'Profile', Icon: ProfileIcon },
 ]
 
+/** Unread counts lifted off LinkedIn's own nav, which our overlay covers. */
+export const badges = signal<Record<string, number>>({})
+
 export function Rail({ current = 'Home' }: { current?: string }) {
   return (
     <nav class="rail" aria-label="LinkedIn">
@@ -40,7 +44,14 @@ export function Rail({ current = 'Home' }: { current?: string }) {
 
       {LINKS.map(({ href, label, Icon }) => (
         <a key={href} class="rail-link" href={href} aria-current={label === current ? 'page' : undefined} title={label}>
-          <Icon />
+          <span class="rail-icon">
+            <Icon />
+            {badges.value[label] ? (
+              <span class="rail-badge" aria-label={`${badges.value[label]} unread`}>
+                {badges.value[label]! > 99 ? '99+' : badges.value[label]}
+              </span>
+            ) : null}
+          </span>
           <span>{label}</span>
         </a>
       ))}

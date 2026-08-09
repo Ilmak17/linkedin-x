@@ -12,6 +12,8 @@ import { ProfileHost } from '../host/profile-host'
 import { CompanyHost } from '../host/company-host'
 import { SavedHost } from '../host/saved-host'
 import { NotificationsHost } from '../host/notifications-host'
+import { BadgesHost } from '../host/badges-host'
+import { badges } from '../ui/Rail'
 import {
   attachNotificationsHost,
   ingestNotifications,
@@ -64,9 +66,11 @@ const profileHost = new ProfileHost()
 const companyHost = new CompanyHost()
 const savedHost = new SavedHost()
 const notificationsHost = new NotificationsHost()
+const badgesHost = new BadgesHost()
 let shadowHost: HTMLElement | null = null
 let unobserve: (() => void) | null = null
 let warmUpTimer: number | null = null
+let unbadge: (() => void) | null = null
 let wired = false
 let mountedSurface: SurfaceName | null = null
 
@@ -122,6 +126,14 @@ function mount(surface: SurfaceName): void {
   // suppress the scrollbar, not the scrolling.
   document.documentElement.style.setProperty('scrollbar-width', 'none')
 
+  // The rail replaces LinkedIn's nav, so the unread counts have to be lifted
+  // off it — otherwise the only way to notice a new message is to leave.
+  // Watched here rather than per surface: every surface has the rail.
+  badges.value = badgesHost.read()
+  unbadge = badgesHost.observe((next) => {
+    badges.value = next
+  })
+
   render(
     surface === 'jobs' ? (
       <JobsPage />
@@ -150,6 +162,7 @@ function mount(surface: SurfaceName): void {
 function wire(): void {
   if (wired || !shadowHost) return
   wired = true
+
 
   if (mountedSurface === 'notifications') {
     attachNotificationsHost(notificationsHost)
@@ -292,6 +305,8 @@ function unmount(): void {
   stopWarmUp()
   unobserve?.()
   unobserve = null
+  unbadge?.()
+  unbadge = null
   wired = false
   shadowHost?.remove()
   shadowHost = null

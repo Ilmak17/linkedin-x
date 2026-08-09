@@ -1120,3 +1120,28 @@ input[type='checkbox']:checked::after {
   font-size: 17px;
   line-height: 18px;
 }
+
+.rail-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 25px;
+}
+.rail-badge {
+  position: absolute;
+  top: -6px;
+  left: 12px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  border: 2px solid var(--bg);
+  box-sizing: content-box;
+}

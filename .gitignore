@@ -10,5 +10,6 @@ fonts/*.woff2
 *.log
 .vite/
 coverage/
+store/screenshots/
 .idea/
 .vscode/

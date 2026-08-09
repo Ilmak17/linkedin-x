@@ -42,6 +42,7 @@ linkedin-x takes a third path: keep LinkedIn's feed running as the engine, draw 
 - **Noise gone by default.** Ads, "people you may know", carousels and polls. Each switchable in the right rail.
 - **Actions still work.** All six reactions, comment, repost, save, connect, follow — all by clicking LinkedIn's own controls.
 - **Keyboard.** `j` `k` move, `l` like, `s` save, `enter` opens replies, `/` searches.
+- **Unread counts** lifted off LinkedIn's own nav onto the rail, since we cover theirs.
 - **It gets out of the way when it breaks.** If a surface cannot be read, it says so and hands you the original.
 
 Design decisions and the token set live in [DESIGN.md](DESIGN.md). Architecture is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
@@ -129,7 +130,7 @@ Click the toolbar icon.
 
 ```bash
 npm run dev        # rebuild the content script on change
-npm test           # 147 tests, no browser needed
+npm test           # 157 tests, no browser needed
 npm run typecheck
 ```
 
