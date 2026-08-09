@@ -46,8 +46,8 @@ effectively undetectable, acting is not.
 | Jobs | `/jobs/search*`, `/jobs/collections/*` | `JobsHost`, two generations | done |
 | Network | `/mynetwork/*` | `NetworkHost` | done |
 | Thread | `/feed` overlay | `DomHost.comments` | this spec |
-| Notifications | `/notifications` | — | blocked |
-| Messaging | `/messaging` | — | blocked |
+| Notifications | `/notifications` | `NotificationsHost` | done |
+| Messaging | `/messaging` | `MessagingHost` | list done, populated row unverified |
 
 ## Remaining work
 

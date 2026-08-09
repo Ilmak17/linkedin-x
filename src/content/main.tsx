@@ -13,6 +13,8 @@ import { CompanyHost } from '../host/company-host'
 import { SavedHost } from '../host/saved-host'
 import { NotificationsHost } from '../host/notifications-host'
 import { BadgesHost } from '../host/badges-host'
+import { MessagingHost } from '../host/messaging-host'
+import { ingestConversations, MessagingPage, messagingWarmingUp } from '../ui/MessagingPage'
 import { badges } from '../ui/Rail'
 import {
   attachNotificationsHost,
@@ -37,7 +39,7 @@ const MOUNT_ID = 'linkedin-x-root'
  * a matcher, a host that reads that page, and a view — nothing in the ones
  * already here has to change.
  */
-type SurfaceName = 'feed' | 'jobs' | 'network' | 'profile' | 'company' | 'saved' | 'notifications'
+type SurfaceName = 'feed' | 'jobs' | 'network' | 'profile' | 'company' | 'saved' | 'notifications' | 'messaging'
 
 const SURFACES: Array<{ name: SurfaceName; match: RegExp }> = [
   { name: 'feed', match: /^\/feed\/?$/ },
@@ -47,6 +49,7 @@ const SURFACES: Array<{ name: SurfaceName; match: RegExp }> = [
   { name: 'company', match: /^\/company\/[^/]+/ },
   { name: 'saved', match: /^\/my-items\// },
   { name: 'notifications', match: /^\/notifications\// },
+  { name: 'messaging', match: /^\/messaging\/?$/ },
   // Search results and a shared post link both render exactly the post markup
   // the feed does, so the feed surface reads them without a reader of its own.
   { name: 'feed', match: /^\/search\/results\// },
@@ -67,6 +70,7 @@ const companyHost = new CompanyHost()
 const savedHost = new SavedHost()
 const notificationsHost = new NotificationsHost()
 const badgesHost = new BadgesHost()
+const messagingHost = new MessagingHost()
 let shadowHost: HTMLElement | null = null
 let unobserve: (() => void) | null = null
 let warmUpTimer: number | null = null
@@ -147,6 +151,8 @@ function mount(surface: SurfaceName): void {
       <SavedPage />
     ) : surface === 'notifications' ? (
       <NotificationsPage />
+    ) : surface === 'messaging' ? (
+      <MessagingPage />
     ) : (
       <App />
     ),
@@ -163,6 +169,15 @@ function wire(): void {
   if (wired || !shadowHost) return
   wired = true
 
+
+  if (mountedSurface === 'messaging') {
+    ingestConversations(messagingHost.harvest())
+    unobserve = messagingHost.observe(ingestConversations)
+    setTimeout(() => {
+      messagingWarmingUp.value = false
+    }, 5000)
+    return
+  }
 
   if (mountedSurface === 'notifications') {
     attachNotificationsHost(notificationsHost)
