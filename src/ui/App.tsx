@@ -46,10 +46,12 @@ export function App() {
 
   return (
     <div class="root" ref={scroller}>
+      <a class="skip-link" href="#lx-timeline">Skip to the timeline</a>
+
       <div class="shell">
         <Rail />
 
-        <main class="feed">
+        <main class="feed" id="lx-timeline" tabIndex={-1}>
           {thread ? (
             <ThreadView post={thread} />
           ) : (
@@ -134,7 +136,7 @@ export function App() {
         <Aside />
       </div>
 
-      <div class="toasts">
+      <div class="toasts" role="status" aria-live="polite" aria-atomic="true">
         {toasts.value.map((t) => (
           <div class={`toast${t.bad ? ' bad' : ''}`} key={t.id}>
             {t.text}

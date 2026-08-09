@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'preact/hooks'
+import { useEffect, useRef, useState } from 'preact/hooks'
 import type { RawComment } from '../host/types'
 import type { Post } from '../model/post'
 import { formatCount } from '../model/post'
@@ -17,6 +17,13 @@ export function ThreadView({ post }: { post: Post }) {
   const [comments, setComments] = useState<RawComment[] | null>(null)
   const [draft, setDraft] = useState('')
   const [sending, setSending] = useState(false)
+  const heading = useRef<HTMLDivElement>(null)
+
+  // Opening a post replaces the whole column. Without moving focus, a screen
+  // reader stays wherever the timeline was and never learns anything changed.
+  useEffect(() => {
+    heading.current?.focus()
+  }, [post.id])
 
   useEffect(() => {
     let live = true
@@ -47,7 +54,7 @@ export function ThreadView({ post }: { post: Post }) {
 
   return (
     <>
-      <div class="kit-head thread-head">
+      <div class="kit-head thread-head" ref={heading} tabIndex={-1} role="heading" aria-level={1}>
         <button class="thread-back" onClick={close} aria-label="Back to the timeline">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M15 5l-7 7 7 7" />

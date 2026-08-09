@@ -32,10 +32,12 @@ export function NetworkPage() {
 
   return (
     <div class="root">
+      <a class="skip-link" href="#lx-timeline">Skip to the content</a>
+
       <div class="shell">
         <Rail current="Network" />
 
-        <main class="feed">
+        <main class="feed" id="lx-timeline" tabIndex={-1}>
           <Tabs
             tabs={[
               { label: 'Grow', active: true },

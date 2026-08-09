@@ -27,10 +27,12 @@ export function NotificationsPage() {
 
   return (
     <div class="root">
+      <a class="skip-link" href="#lx-timeline">Skip to the content</a>
+
       <div class="shell">
         <Rail current="Notifications" />
 
-        <main class="feed">
+        <main class="feed" id="lx-timeline" tabIndex={-1}>
           <Tabs
             tabs={[
               { label: 'All', active: true },

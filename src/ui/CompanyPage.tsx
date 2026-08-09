@@ -23,10 +23,12 @@ export function CompanyPage() {
 
   return (
     <div class="root">
+      <a class="skip-link" href="#lx-timeline">Skip to the content</a>
+
       <div class="shell">
         <Rail current="Home" />
 
-        <main class="feed">
+        <main class="feed" id="lx-timeline" tabIndex={-1}>
           <div class="profile-cover" />
 
           <div class="profile-head">
