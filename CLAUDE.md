@@ -34,7 +34,7 @@ Nothing above `src/host/` may import the DOM contract; nothing in `src/filter/` 
 ## Verification
 
 ```bash
-npm test         # 192 tests over fixtures in tests/fixtures/, no browser needed
+npm test         # 202 tests over fixtures in tests/fixtures/, no browser needed
 npm run typecheck
 npm run build
 ```
@@ -44,6 +44,13 @@ Actions (like, comment, repost, save) cannot be covered by fixtures. If you chan
 ## Diagnostics
 
 The content script runs in an isolated world, so `window.__linkedinX` is invisible to the DevTools console. The doctor report is mirrored onto `document.documentElement.dataset.linkedinXDoctor`, which both worlds can read. Keep it that way: anything meant for a human to read from the console has to cross the world boundary through the DOM.
+
+## Performance rules
+
+LinkedIn mutates its DOM continuously. Anything wired to a MutationObserver
+must be throttled, must not re-parse what has not changed, and must not
+replace a signals array when the contents are identical — that last one
+re-renders the whole timeline.  has both helpers.
 
 ## Hard constraints
 

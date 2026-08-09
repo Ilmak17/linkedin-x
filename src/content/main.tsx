@@ -29,6 +29,7 @@ import { attachNetworkHost, ingestPeople, NetworkPage, networkWarmingUp } from '
 import { cachedSettings, loadSettings, onSettingsChanged, type AppSettings } from '../lib/settings'
 import { App } from '../ui/App'
 import { surfaceFor, type SurfaceName } from './surfaces'
+import { throttle } from '../lib/throttle'
 
 const MOUNT_ID = 'linkedin-x-root'
 
@@ -65,7 +66,18 @@ const THEME = 'dark'
  * page's world. Writing the report to a data attribute crosses that boundary,
  * because the DOM is the one thing both worlds share.
  */
+/**
+ * Throttled hard: this is a diagnostic a human reads from the console a few
+ * times a year, and it was serialising and writing to the DOM on every
+ * mutation burst.
+ */
+const doctorPump = throttle(() => publishDoctorNow(), 3000)
+
 function publishDoctor(): void {
+  doctorPump.call()
+}
+
+function publishDoctorNow(): void {
   try {
     document.documentElement.dataset.linkedinXDoctor = JSON.stringify(host.doctor())
   } catch {

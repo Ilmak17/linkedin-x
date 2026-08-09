@@ -1,4 +1,5 @@
 import { fail, ok, type Result } from '../lib/result'
+import { throttle } from '../lib/throttle'
 import type { DoctorReport, HostFeed, PostAction, RawComment, RawPost } from './types'
 import {
   cleanText,
@@ -32,9 +33,14 @@ import {
  * what each one is. That is uglier than a selector per field, but it survives
  * a deploy, which a hashed class name does not.
  */
+/** How often a mutation storm is allowed to trigger a re-parse. */
+const HARVEST_EVERY_MS = 250
+
 export class DomHost implements HostFeed {
   #observer: MutationObserver | null = null
   #lastMissing: string[] = []
+  /** Parsed posts, keyed by id and a cheap signature of the source element. */
+  #cache = new Map<string, { signature: string; post: RawPost }>()
 
   isReady(): boolean {
     return this.#postElements().length > 0
@@ -57,42 +63,51 @@ export class DomHost implements HostFeed {
       if (!id || seen.has(id)) continue
       seen.add(id)
 
-      const post = isLegacy(el) ? readLegacyPost(el, id) : readSduiPost(el, id)
+      // Re-parsing an unchanged post is the bulk of a harvest, and most posts
+      // are unchanged in any given mutation burst.
+      const signature = signatureOfElement(el)
+      const cached = this.#cache.get(id)
+      const post =
+        cached?.signature === signature
+          ? cached.post
+          : isLegacy(el)
+            ? readLegacyPost(el, id)
+            : readSduiPost(el, id)
+      this.#cache.set(id, { signature, post })
+
       if (!post.authorName) missing.add('authorName')
       if (!post.text && !post.imageUrl && !post.hasVideo) missing.add('body')
       posts.push(post)
     }
 
     this.#lastMissing = [...missing]
+    // Anything no longer on the page cannot come back with the same id.
+    if (this.#cache.size > seen.size * 2) {
+      for (const key of this.#cache.keys()) if (!seen.has(key)) this.#cache.delete(key)
+    }
     return posts
   }
 
   observe(onChange: (posts: RawPost[]) => void): () => void {
     // Deliberately the document element, not the feed container. LinkedIn
     // hydrates the feed after document_idle and swaps whole subtrees while it
-    // does, so an observer bound to the container we found at start-up ends
-    // up watching a node that is no longer in the document, and never fires
-    // again. `documentElement` is the one node that is never replaced.
+    // does, so an observer bound to the container found at start-up ends up
+    // watching a node that is no longer in the document and never fires again.
     //
     // This does not loop on our own renders: the timeline lives in a shadow
     // root, and a MutationObserver on the host document does not see inside
     // shadow trees.
-    const root = document.documentElement
-    let queued = false
+    //
+    // Throttled rather than per-frame. LinkedIn mutates constantly, and one
+    // full re-parse per animation frame on a real feed is most of the cost
+    // this extension adds to the page.
+    const pump = throttle(() => onChange(this.harvest()), HARVEST_EVERY_MS)
 
-    this.#observer = new MutationObserver(() => {
-      if (queued) return
-      queued = true
-      // The feed mutates in bursts while LinkedIn hydrates a page of results.
-      // One harvest per animation frame is plenty.
-      requestAnimationFrame(() => {
-        queued = false
-        onChange(this.harvest())
-      })
-    })
+    this.#observer = new MutationObserver(pump.call)
+    this.#observer.observe(document.documentElement, { childList: true, subtree: true })
 
-    this.#observer.observe(root, { childList: true, subtree: true })
     return () => {
+      pump.cancel()
       this.#observer?.disconnect()
       this.#observer = null
     }
@@ -460,6 +475,16 @@ function readComment(el: Element): RawComment {
     text,
     timeLabel: firstTimeToken(timeLabel),
   }
+}
+
+/**
+ * Changes cheaply enough to test on every burst, and covers everything the UI
+ * shows: the post's own length, and the state of its reaction control.
+ */
+function signatureOfElement(el: Element): string {
+  const like = queryOne(el, 'likeButton')?.getAttribute('aria-label') ?? ''
+  const body = queryOne(el, 'body')?.textContent?.length ?? 0
+  return `${el.childElementCount}:${body}:${like}`
 }
 
 const isLegacy = (el: Element): boolean => el.hasAttribute('data-urn') || el.hasAttribute('data-id')

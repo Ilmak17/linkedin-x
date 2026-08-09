@@ -3,6 +3,7 @@ import { shouldShow } from '../filter/classify'
 import type { HostFeed, PostAction } from '../host/types'
 import { normalize, type Post } from '../model/post'
 import { DEFAULTS, type AppSettings } from '../lib/settings'
+import { signatureOf } from '../lib/throttle'
 
 /**
  * All application state. Owns optimistic updates and the kill switch; knows
@@ -40,7 +41,16 @@ export function attachHost(h: HostFeed): void {
   host = h
 }
 
+let lastSignature = ''
+
 export function ingest(raws: Parameters<typeof normalize>[0][]): void {
+  // The observer fires on every LinkedIn mutation, and assigning a new array
+  // each time re-rendered the whole timeline whether or not anything had
+  // changed. Most bursts change nothing we display.
+  const signature = signatureOf(raws)
+  if (signature === lastSignature) return
+  lastSignature = signature
+
   const incoming = raws.map(normalize)
   const byId = new Map(allPosts.value.map((p) => [p.id, p]))
 

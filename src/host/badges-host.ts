@@ -1,4 +1,5 @@
 import { normalizeWhitespace } from './selectors'
+import { throttle } from '../lib/throttle'
 
 /**
  * Reads the unread counts off LinkedIn's own navigation.
@@ -30,17 +31,20 @@ export class BadgesHost {
   }
 
   observe(onChange: (badges: Badges) => void): () => void {
-    let queued = false
-    const observer = new MutationObserver(() => {
-      if (queued) return
-      queued = true
-      requestAnimationFrame(() => {
-        queued = false
-        onChange(this.read())
-      })
-    })
-    observer.observe(document.documentElement, { childList: true, subtree: true, characterData: true })
-    return () => observer.disconnect()
+    // Scoped to the navigation, throttled to once a second, and without
+    // characterData. The first version watched the whole document for every
+    // text change, which on LinkedIn is a firehose, to read four numbers that
+    // change a few times an hour.
+    const nav = document.querySelector('nav, [data-testid="primary-nav"], .global-nav') ?? document.body
+    const pump = throttle(() => onChange(this.read()), 1000)
+
+    const observer = new MutationObserver(pump.call)
+    observer.observe(nav, { childList: true, subtree: true })
+
+    return () => {
+      pump.cancel()
+      observer.disconnect()
+    }
   }
 }
 
